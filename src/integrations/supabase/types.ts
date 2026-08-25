@@ -14,16 +14,131 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          nome: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          nome?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          nome?: string | null
+        }
+        Relationships: []
+      }
+      protocolos: {
+        Row: {
+          cif: string
+          compradores: string
+          created_at: string
+          created_by: string | null
+          historico: string
+          id: string
+          imovel: string
+          matricula: string
+          numero: string
+          status: string
+          tipo_imovel: string
+          tipo_negociacao: string
+          updated_at: string
+          vendedores: string
+        }
+        Insert: {
+          cif?: string
+          compradores?: string
+          created_at?: string
+          created_by?: string | null
+          historico?: string
+          id?: string
+          imovel?: string
+          matricula?: string
+          numero?: string
+          status?: string
+          tipo_imovel?: string
+          tipo_negociacao?: string
+          updated_at?: string
+          vendedores?: string
+        }
+        Update: {
+          cif?: string
+          compradores?: string
+          created_at?: string
+          created_by?: string | null
+          historico?: string
+          id?: string
+          imovel?: string
+          matricula?: string
+          numero?: string
+          status?: string
+          tipo_imovel?: string
+          tipo_negociacao?: string
+          updated_at?: string
+          vendedores?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      consultar_protocolo: {
+        Args: { p_numero: string }
+        Returns: {
+          cif: string
+          compradores: string
+          created_at: string
+          historico: string
+          imovel: string
+          matricula: string
+          numero: string
+          status: string
+          tipo_imovel: string
+          tipo_negociacao: string
+          updated_at: string
+          vendedores: string
+        }[]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +265,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
