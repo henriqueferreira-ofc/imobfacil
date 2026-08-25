@@ -87,8 +87,8 @@ function ConsultaProtocolo() {
           <div className="space-y-4">
             <section className="bg-brand-gradient shadow-panel rounded-3xl px-5 py-6 text-primary-foreground sm:px-10 sm:py-8">
               <p className="text-eyebrow text-primary-foreground/70">Protocolo</p>
-              <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
-                <h1 className="truncate font-display text-2xl font-bold sm:text-3xl lg:text-4xl">
+              <div className="mt-2 flex flex-col items-start gap-3 sm:grid sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-4">
+                <h1 className="font-display text-2xl font-bold break-all sm:truncate sm:break-normal sm:text-3xl lg:text-4xl">
                   {data.numero}
                 </h1>
                 <span className="shrink-0 rounded-full bg-card px-3 py-1.5">
