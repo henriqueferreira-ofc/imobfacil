@@ -150,16 +150,6 @@ export function ProtocoloDialog({
               required
             />
           </div>
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="imovel">Identificação do imóvel</Label>
-            <Input
-              id="imovel"
-              value={form.imovel}
-              onChange={(e) => set("imovel", e.target.value)}
-              placeholder="Ex.: Quadra 15, Casa 54"
-              required
-            />
-          </div>
 
           <div className="sm:col-span-2">
             <p className="text-eyebrow text-muted-foreground">Endereço do imóvel</p>
