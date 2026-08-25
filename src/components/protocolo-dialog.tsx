@@ -113,7 +113,7 @@ export function ProtocoloDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-2xl">
+      <DialogContent className="max-h-[90dvh] w-[calc(100vw-2rem)] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="font-display">
             {protocolo ? `Editar ${protocolo.numero}` : "Novo protocolo"}
@@ -294,11 +294,11 @@ export function ProtocoloDialog({
             </p>
           </div>
 
-          <DialogFooter className="sm:col-span-2">
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+          <DialogFooter className="gap-2 sm:col-span-2">
+            <Button type="button" variant="ghost" className="w-full sm:w-auto" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={salvar.isPending}>
+            <Button type="submit" className="w-full sm:w-auto" disabled={salvar.isPending}>
               {salvar.isPending ? "Salvando..." : "Salvar protocolo"}
             </Button>
           </DialogFooter>

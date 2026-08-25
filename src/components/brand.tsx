@@ -8,7 +8,7 @@ export function Logo({ className }: { className?: string }) {
     <img
       src={logoAsset.url}
       alt="ImobFácil"
-      className={cn("h-14 w-14 rounded-xl object-cover shadow-soft", className)}
+      className={cn("size-11 shrink-0 rounded-xl object-cover shadow-soft sm:size-14", className)}
       loading="eager"
     />
   );
@@ -16,13 +16,13 @@ export function Logo({ className }: { className?: string }) {
 
 export function Wordmark({ subtitle }: { subtitle?: string }) {
   return (
-    <Link to="/" className="flex min-w-0 items-center gap-3">
+    <Link to="/" className="flex min-w-0 items-center gap-2.5 sm:gap-3">
       <Logo />
       <span className="min-w-0">
-        <span className="block truncate font-display text-lg leading-none font-bold">
+        <span className="block truncate font-display text-base leading-none font-bold sm:text-lg">
           Imob<span className="text-brand-bright">Fácil</span>
         </span>
-        <span className="block truncate text-[11px] tracking-wide text-muted-foreground">
+        <span className="block truncate text-[10px] tracking-wide text-muted-foreground sm:text-[11px]">
           {subtitle ?? "Cadastre • Gerencie • Venda"}
         </span>
       </span>

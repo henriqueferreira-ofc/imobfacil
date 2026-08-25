@@ -117,7 +117,7 @@ function Admin() {
 
   if (loading || loadingRole) {
     return (
-      <div className="mx-auto max-w-6xl space-y-4 p-6">
+      <div className="mx-auto max-w-6xl space-y-4 p-4 sm:p-6">
         <Skeleton className="h-16 rounded-2xl" />
         <Skeleton className="h-64 rounded-2xl" />
       </div>
@@ -156,7 +156,7 @@ function Admin() {
   return (
     <div className="min-h-screen">
       <header className="border-b bg-card">
-        <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 py-4">
+        <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:px-6 sm:py-4">
           <Wordmark subtitle="Painel administrativo" />
           <div className="flex shrink-0 items-center gap-2">
             <Button asChild variant="ghost" size="sm">
@@ -173,8 +173,8 @@ function Admin() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-5 py-8">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {[
             { label: "Protocolos", valor: totais.total },
             { label: "Em andamento", valor: totais.andamento },
@@ -183,7 +183,7 @@ function Admin() {
           ].map((item) => (
             <div key={item.label} className="shadow-soft rounded-2xl border bg-card p-4">
               <p className="text-eyebrow text-muted-foreground">{item.label}</p>
-              <p className="mt-1.5 font-display text-2xl font-bold">{item.valor}</p>
+              <p className="mt-1.5 font-display text-xl font-bold sm:text-2xl">{item.valor}</p>
             </div>
           ))}
         </div>
@@ -194,7 +194,7 @@ function Admin() {
             <Input
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              placeholder="Buscar por número, parte, imóvel, matrícula..."
+              placeholder="Buscar protocolo, parte, endereço..."
               className="pl-9"
             />
           </div>
@@ -224,11 +224,11 @@ function Admin() {
             </div>
           ) : (
             filtrados.map((p) => (
-              <article key={p.id} className="shadow-soft rounded-2xl border bg-card p-5">
+              <article key={p.id} className="shadow-soft rounded-2xl border bg-card p-4 sm:p-5">
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="font-display text-lg font-bold">{p.numero}</h2>
+                      <h2 className="font-display text-base font-bold sm:text-lg">{p.numero}</h2>
                       <StatusBadge status={p.status} />
                     </div>
                     <p className="mt-1 truncate text-sm text-muted-foreground">
@@ -258,7 +258,7 @@ function Admin() {
                   </div>
                 </div>
 
-                <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-4">
+                <dl className="mt-4 grid grid-cols-2 gap-3 text-sm lg:grid-cols-4">
                   <div className="min-w-0">
                     <dt className="text-eyebrow text-muted-foreground">Vendedor(es)</dt>
                     <dd className="truncate">{p.vendedores || "—"}</dd>

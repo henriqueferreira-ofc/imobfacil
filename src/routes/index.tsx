@@ -56,7 +56,7 @@ function Home() {
 
   return (
     <div className="min-h-screen">
-      <header className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 py-5">
+      <header className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-4 sm:px-6 sm:py-5">
         <Wordmark />
         <Button asChild variant="ghost" size="sm" className="shrink-0">
           <Link to="/auth">
@@ -67,8 +67,8 @@ function Home() {
         </Button>
       </header>
 
-      <main className="mx-auto max-w-6xl px-5 pb-20">
-        <section className="bg-brand-gradient shadow-panel relative overflow-hidden rounded-3xl px-6 py-12 text-primary-foreground sm:px-12 sm:py-16">
+      <main className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-20">
+        <section className="bg-brand-gradient shadow-panel relative overflow-hidden rounded-3xl px-5 py-10 text-primary-foreground sm:px-10 sm:py-14 lg:px-12 lg:py-16">
           <div
             aria-hidden
             className="absolute -top-24 -right-16 h-72 w-72 rounded-full bg-brand-bright/25 blur-3xl"
@@ -77,23 +77,23 @@ function Home() {
             <p className="text-eyebrow text-primary-foreground/70">
               Tudo para corretores, em um só lugar
             </p>
-            <h1 className="mt-4 text-4xl leading-[1.05] font-bold sm:text-5xl">
+            <h1 className="mt-3 text-[1.75rem] leading-[1.1] font-bold sm:mt-4 sm:text-4xl lg:text-5xl">
               Consulte o andamento da sua negociação
             </h1>
-            <p className="mt-4 max-w-xl text-base text-primary-foreground/80">
+            <p className="mt-3 max-w-xl text-sm text-primary-foreground/80 sm:mt-4 sm:text-base">
               Informe o número do protocolo entregue pelo corretor e veja imóvel, partes
               envolvidas, tipo de negociação e todo o histórico atualizado.
             </p>
 
-            <form onSubmit={consultar} className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <form onSubmit={consultar} className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row">
               <Input
                 value={numero}
                 onChange={(e) => setNumero(e.target.value)}
                 placeholder="Ex.: PRT-2026-1001"
                 aria-label="Número do protocolo"
-                className="h-12 border-transparent bg-card text-base text-foreground placeholder:text-muted-foreground sm:max-w-xs"
+                className="h-12 w-full border-transparent bg-card text-base text-foreground placeholder:text-muted-foreground sm:max-w-xs"
               />
-              <Button type="submit" size="lg" variant="secondary" className="h-12 font-semibold">
+              <Button type="submit" size="lg" variant="secondary" className="h-12 w-full font-semibold sm:w-auto">
                 Consultar protocolo
                 <ArrowRight className="size-4" />
               </Button>
@@ -104,9 +104,9 @@ function Home() {
           </div>
         </section>
 
-        <section className="mt-8 grid gap-4 sm:grid-cols-3">
+        <section className="mt-6 grid gap-4 sm:mt-8 sm:grid-cols-2 lg:grid-cols-3">
           {passos.map(({ icon: Icon, titulo, texto }) => (
-            <div key={titulo} className="shadow-soft rounded-2xl border bg-card p-6">
+            <div key={titulo} className="shadow-soft rounded-2xl border bg-card p-5 sm:p-6">
               <span className="flex size-10 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
                 <Icon className="size-5" />
               </span>
@@ -118,7 +118,7 @@ function Home() {
       </main>
 
       <footer className="border-t py-8">
-        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-2 px-5 text-xs text-muted-foreground sm:flex-row sm:items-center">
+        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-2 px-4 text-xs sm:px-6 text-muted-foreground sm:flex-row sm:items-center">
           <div>
             <span className="font-semibold text-foreground">ImobFácil</span>
             <span className="ml-1">Protocolos de compra e venda de casas, lotes e apartamentos.</span>
