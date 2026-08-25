@@ -220,8 +220,7 @@ function Admin() {
                       <h2 className="font-display text-lg font-bold">{p.numero}</h2>
                       <StatusBadge status={p.status} />
                     </div>
-                    <p className="mt-1 truncate text-sm text-muted-foreground">{p.imovel}</p>
-                    <p className="truncate text-xs text-muted-foreground">
+                    <p className="mt-1 truncate text-sm text-muted-foreground">
                       {enderecoCompleto(p) || "Endereço não informado"}
                     </p>
                   </div>
