@@ -118,9 +118,12 @@ function Home() {
       </main>
 
       <footer className="border-t py-8">
-        <div className="mx-auto flex max-w-6xl flex-col gap-1 px-5 text-xs text-muted-foreground">
-          <span className="font-semibold text-foreground">ImobFácil</span>
-          <span>Protocolos de compra e venda de casas, lotes e apartamentos.</span>
+        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-2 px-5 text-xs text-muted-foreground sm:flex-row sm:items-center">
+          <div>
+            <span className="font-semibold text-foreground">ImobFácil</span>
+            <span className="ml-1">Protocolos de compra e venda de casas, lotes e apartamentos.</span>
+          </div>
+          <span>© 2026 Todos os Direitos reservados a ImobFácil</span>
         </div>
       </footer>
     </div>
