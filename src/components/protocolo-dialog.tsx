@@ -34,7 +34,7 @@ type FormState = Pick<
   Protocolo,
   | "vendedores"
   | "compradores"
-  | "imovel"
+  | "endereco"
   | "endereco"
   | "numero_casa"
   | "bairro"
