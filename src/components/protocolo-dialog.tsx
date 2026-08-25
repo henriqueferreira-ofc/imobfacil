@@ -52,7 +52,7 @@ type FormState = Pick<
 const vazio: FormState = {
   vendedores: "",
   compradores: "",
-  imovel: "",
+  
   endereco: "",
   numero_casa: "",
   bairro: "",
