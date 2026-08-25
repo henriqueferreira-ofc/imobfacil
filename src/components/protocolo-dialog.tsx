@@ -34,7 +34,7 @@ type FormState = Pick<
   Protocolo,
   | "vendedores"
   | "compradores"
-  | "imovel"
+  | "endereco"
   | "endereco"
   | "numero_casa"
   | "bairro"
@@ -52,7 +52,7 @@ type FormState = Pick<
 const vazio: FormState = {
   vendedores: "",
   compradores: "",
-  imovel: "",
+  
   endereco: "",
   numero_casa: "",
   bairro: "",
@@ -147,16 +147,6 @@ export function ProtocoloDialog({
               id="compradores"
               value={form.compradores}
               onChange={(e) => set("compradores", e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="imovel">Identificação do imóvel</Label>
-            <Input
-              id="imovel"
-              value={form.imovel}
-              onChange={(e) => set("imovel", e.target.value)}
-              placeholder="Ex.: Quadra 15, Casa 54"
               required
             />
           </div>
