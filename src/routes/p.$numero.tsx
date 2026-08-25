@@ -121,6 +121,17 @@ function ConsultaProtocolo() {
             </section>
 
             <section className="shadow-soft rounded-3xl border bg-card p-6 sm:p-8">
+              <h2 className="text-base font-semibold">Endereço do imóvel</h2>
+              <dl className="mt-5 grid gap-5 sm:grid-cols-2">
+                <Campo label="Endereço" valor={data.endereco} />
+                <Campo label="Número" valor={data.numero_casa} />
+                <Campo label="Bairro" valor={data.bairro} />
+                <Campo label="CEP" valor={data.cep} />
+                <Campo label="Cidade" valor={data.cidade} />
+                <Campo label="Estado" valor={data.estado} />
+            </section>
+
+            <section className="shadow-soft rounded-3xl border bg-card p-6 sm:p-8">
               <h2 className="text-base font-semibold">Histórico</h2>
               {data.historico.trim() ? (
                 <ol className="mt-5 space-y-4">
