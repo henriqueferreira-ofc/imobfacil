@@ -37,15 +37,21 @@ export type Database = {
       }
       protocolos: {
         Row: {
+          bairro: string
+          cep: string
+          cidade: string
           cif: string
           compradores: string
           created_at: string
           created_by: string | null
+          endereco: string
+          estado: string
           historico: string
           id: string
           imovel: string
           matricula: string
           numero: string
+          numero_casa: string
           status: string
           tipo_imovel: string
           tipo_negociacao: string
@@ -53,15 +59,21 @@ export type Database = {
           vendedores: string
         }
         Insert: {
+          bairro?: string
+          cep?: string
+          cidade?: string
           cif?: string
           compradores?: string
           created_at?: string
           created_by?: string | null
+          endereco?: string
+          estado?: string
           historico?: string
           id?: string
           imovel?: string
           matricula?: string
           numero?: string
+          numero_casa?: string
           status?: string
           tipo_imovel?: string
           tipo_negociacao?: string
@@ -69,15 +81,21 @@ export type Database = {
           vendedores?: string
         }
         Update: {
+          bairro?: string
+          cep?: string
+          cidade?: string
           cif?: string
           compradores?: string
           created_at?: string
           created_by?: string | null
+          endereco?: string
+          estado?: string
           historico?: string
           id?: string
           imovel?: string
           matricula?: string
           numero?: string
+          numero_casa?: string
           status?: string
           tipo_imovel?: string
           tipo_negociacao?: string
@@ -115,13 +133,19 @@ export type Database = {
       consultar_protocolo: {
         Args: { p_numero: string }
         Returns: {
+          bairro: string
+          cep: string
+          cidade: string
           cif: string
           compradores: string
           created_at: string
+          endereco: string
+          estado: string
           historico: string
           imovel: string
           matricula: string
           numero: string
+          numero_casa: string
           status: string
           tipo_imovel: string
           tipo_negociacao: string

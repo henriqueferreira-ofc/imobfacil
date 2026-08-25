@@ -21,6 +21,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin, useSession } from "@/hooks/useSession";
 import {
+  enderecoCompleto,
   formatarData,
   STATUS_LABEL,
   TIPO_IMOVEL_LABEL,
@@ -220,6 +221,9 @@ function Admin() {
                       <StatusBadge status={p.status} />
                     </div>
                     <p className="mt-1 truncate text-sm text-muted-foreground">{p.imovel}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {enderecoCompleto(p) || "Endereço não informado"}
+                    </p>
                   </div>
                   <div className="flex shrink-0 gap-1">
                     <Button
