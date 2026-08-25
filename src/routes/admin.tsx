@@ -21,6 +21,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin, useSession } from "@/hooks/useSession";
 import {
+  enderecoCompleto,
   formatarData,
   STATUS_LABEL,
   TIPO_IMOVEL_LABEL,
