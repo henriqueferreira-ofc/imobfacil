@@ -43,7 +43,10 @@ function AuthPage() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
     setLoading(false);
-    if (error) return toast.error("Não foi possível entrar", { description: error.message });
+    if (error) {
+      toast.error("Não foi possível entrar", { description: error.message });
+      return;
+    }
     navigate({ to: "/admin", replace: true });
   }
 
@@ -56,7 +59,10 @@ function AuthPage() {
       options: { emailRedirectTo: window.location.origin, data: { nome } },
     });
     setLoading(false);
-    if (error) return toast.error("Não foi possível cadastrar", { description: error.message });
+    if (error) {
+      toast.error("Não foi possível cadastrar", { description: error.message });
+      return;
+    }
     if (!data.session) {
       toast.success("Cadastro criado", {
         description: "Confirme o e-mail que enviamos para ativar o acesso.",
