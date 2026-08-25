@@ -8,6 +8,12 @@ export interface Protocolo {
   vendedores: string;
   compradores: string;
   imovel: string;
+  endereco: string;
+  numero_casa: string;
+  bairro: string;
+  cep: string;
+  cidade: string;
+  estado: string;
   matricula: string;
   cif: string;
   tipo_imovel: TipoImovel;
