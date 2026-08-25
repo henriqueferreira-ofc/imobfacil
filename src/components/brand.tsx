@@ -8,7 +8,7 @@ export function Logo({ className }: { className?: string }) {
     <img
       src={logoAsset.url}
       alt="ImobFácil"
-      className={cn("h-10 w-10 rounded-xl object-cover shadow-soft", className)}
+      className={cn("h-14 w-14 rounded-xl object-cover shadow-soft", className)}
       loading="eager"
     />
   );
