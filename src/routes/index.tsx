@@ -123,7 +123,7 @@ function Home() {
             <span className="font-semibold text-foreground">ImobFácil</span>
             <span className="ml-1">Protocolos de compra e venda de casas, lotes e apartamentos.</span>
           </div>
-          <span>© 2026 Todos os Direitos reservados a ImobFácil</span>
+          <span>© 2026 Todos os Direitos reservados a <strong className="font-semibold text-foreground">ImobFácil</strong></span>
         </div>
       </footer>
     </div>
