@@ -90,7 +90,18 @@ function Admin() {
     const termo = busca.trim().toLowerCase();
     if (!termo) return protocolos ?? [];
     return (protocolos ?? []).filter((p) =>
-      [p.numero, p.vendedores, p.compradores, p.imovel, p.matricula, p.cif]
+      [
+        p.numero,
+        p.vendedores,
+        p.compradores,
+        p.endereco,
+        p.bairro,
+        p.cidade,
+        p.estado,
+        p.cep,
+        p.matricula,
+        p.cif,
+      ]
         .join(" ")
         .toLowerCase()
         .includes(termo),
