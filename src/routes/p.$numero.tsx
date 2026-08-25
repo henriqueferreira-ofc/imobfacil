@@ -106,7 +106,7 @@ function ConsultaProtocolo() {
               <dl className="mt-5 grid gap-5 sm:grid-cols-2">
                 <Campo label="Vendedor(es)" valor={data.vendedores} />
                 <Campo label="Comprador(es)" valor={data.compradores} />
-                <Campo label="Imóvel" valor={data.imovel} />
+                
                 <Campo label="Matrícula" valor={data.matricula} />
                 <Campo label="CIF" valor={data.cif} />
                 <Campo
