@@ -53,7 +53,7 @@ function ConsultaProtocolo() {
 
   return (
     <div className="min-h-screen">
-      <header className="mx-auto grid max-w-4xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 py-5">
+      <header className="mx-auto grid max-w-4xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-4 sm:px-6 sm:py-5">
         <Wordmark subtitle="Consulta pública" />
         <Button asChild variant="ghost" size="sm" className="shrink-0">
           <Link to="/">
@@ -63,7 +63,7 @@ function ConsultaProtocolo() {
         </Button>
       </header>
 
-      <main className="mx-auto max-w-4xl px-5 pb-20">
+      <main className="mx-auto max-w-4xl px-4 pb-16 sm:px-6 sm:pb-20">
         {isLoading ? (
           <div className="space-y-4">
             <Skeleton className="h-28 rounded-3xl" />
@@ -85,10 +85,10 @@ function ConsultaProtocolo() {
           </div>
         ) : (
           <div className="space-y-4">
-            <section className="bg-brand-gradient shadow-panel rounded-3xl px-6 py-8 text-primary-foreground sm:px-10">
+            <section className="bg-brand-gradient shadow-panel rounded-3xl px-5 py-6 text-primary-foreground sm:px-10 sm:py-8">
               <p className="text-eyebrow text-primary-foreground/70">Protocolo</p>
-              <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
-                <h1 className="truncate font-display text-3xl font-bold sm:text-4xl">
+              <div className="mt-2 flex flex-col items-start gap-3 sm:grid sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-4">
+                <h1 className="font-display text-2xl font-bold break-all sm:truncate sm:break-normal sm:text-3xl lg:text-4xl">
                   {data.numero}
                 </h1>
                 <span className="shrink-0 rounded-full bg-card px-3 py-1.5">
@@ -101,9 +101,9 @@ function ConsultaProtocolo() {
               </p>
             </section>
 
-            <section className="shadow-soft rounded-3xl border bg-card p-6 sm:p-8">
+            <section className="shadow-soft rounded-3xl border bg-card p-5 sm:p-8">
               <h2 className="text-base font-semibold">Dados da negociação</h2>
-              <dl className="mt-5 grid gap-5 sm:grid-cols-2">
+              <dl className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <Campo label="Vendedor(es)" valor={data.vendedores} />
                 <Campo label="Comprador(es)" valor={data.compradores} />
                 
@@ -120,9 +120,9 @@ function ConsultaProtocolo() {
               </dl>
             </section>
 
-            <section className="shadow-soft rounded-3xl border bg-card p-6 sm:p-8">
+            <section className="shadow-soft rounded-3xl border bg-card p-5 sm:p-8">
               <h2 className="text-base font-semibold">Endereço do imóvel</h2>
-              <dl className="mt-5 grid gap-5 sm:grid-cols-2">
+              <dl className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <Campo label="Endereço" valor={data.endereco} />
                 <Campo label="Número" valor={data.numero_casa} />
                 <Campo label="Bairro" valor={data.bairro} />
@@ -132,7 +132,7 @@ function ConsultaProtocolo() {
               </dl>
             </section>
 
-            <section className="shadow-soft rounded-3xl border bg-card p-6 sm:p-8">
+            <section className="shadow-soft rounded-3xl border bg-card p-5 sm:p-8">
               <h2 className="text-base font-semibold">Histórico</h2>
               {data.historico.trim() ? (
                 <ol className="mt-5 space-y-4">
