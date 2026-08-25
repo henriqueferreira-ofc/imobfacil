@@ -66,3 +66,26 @@ export function formatarDataHora(iso: string) {
 export function normalizarNumero(valor: string) {
   return valor.trim().toUpperCase();
 }
+
+export function formatarCep(valor: string) {
+  const digitos = valor.replace(/\D/g, "").slice(0, 8);
+  return digitos.length > 5 ? `${digitos.slice(0, 5)}-${digitos.slice(5)}` : digitos;
+}
+
+export function enderecoCompleto(p: {
+  endereco: string;
+  numero_casa: string;
+  bairro: string;
+  cep: string;
+  cidade: string;
+  estado: string;
+}) {
+  const rua = [p.endereco, p.numero_casa].filter(Boolean).join(", ");
+  const cidadeUf = [p.cidade, p.estado].filter(Boolean).join(" - ");
+  return [rua, p.bairro, cidadeUf, p.cep].filter(Boolean).join(" • ");
+}
+
+export const ESTADOS_UF = [
+  "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR",
+  "PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO",
+];
