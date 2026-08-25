@@ -86,7 +86,7 @@ function AuthPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="mx-auto grid w-full max-w-5xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 py-5">
+      <header className="mx-auto grid w-full max-w-5xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-4 sm:px-6 sm:py-5">
         <Wordmark subtitle="Acesso restrito" />
         <Button asChild variant="ghost" size="sm" className="shrink-0">
           <Link to="/">
@@ -96,7 +96,7 @@ function AuthPage() {
         </Button>
       </header>
 
-      <main className="mx-auto flex w-full max-w-md flex-1 items-center px-5 pb-16">
+      <main className="mx-auto flex w-full max-w-md flex-1 items-center px-4 pb-12 sm:px-6 sm:pb-16">
         <div className="shadow-panel w-full rounded-3xl border bg-card p-7">
           <h1 className="font-display text-2xl font-bold">Painel do administrador</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
