@@ -151,13 +151,76 @@ export function ProtocoloDialog({
             />
           </div>
           <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="imovel">Imóvel</Label>
+            <Label htmlFor="imovel">Identificação do imóvel</Label>
             <Input
               id="imovel"
               value={form.imovel}
               onChange={(e) => set("imovel", e.target.value)}
+              placeholder="Ex.: Quadra 15, Casa 54"
               required
             />
+          </div>
+
+          <div className="sm:col-span-2">
+            <p className="text-eyebrow text-muted-foreground">Endereço do imóvel</p>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="endereco">Endereço (rua/avenida)</Label>
+            <Input
+              id="endereco"
+              value={form.endereco}
+              onChange={(e) => set("endereco", e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="numero_casa">Número</Label>
+            <Input
+              id="numero_casa"
+              value={form.numero_casa}
+              onChange={(e) => set("numero_casa", e.target.value)}
+              inputMode="numeric"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="bairro">Bairro</Label>
+            <Input
+              id="bairro"
+              value={form.bairro}
+              onChange={(e) => set("bairro", e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="cep">CEP</Label>
+            <Input
+              id="cep"
+              value={form.cep}
+              onChange={(e) => set("cep", formatarCep(e.target.value))}
+              inputMode="numeric"
+              placeholder="00000-000"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="cidade">Cidade</Label>
+            <Input
+              id="cidade"
+              value={form.cidade}
+              onChange={(e) => set("cidade", e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Estado (UF)</Label>
+            <Select value={form.estado} onValueChange={(v) => set("estado", v)}>
+              <SelectTrigger>
+                <SelectValue placeholder="UF" />
+              </SelectTrigger>
+              <SelectContent>
+                {ESTADOS_UF.map((uf) => (
+                  <SelectItem key={uf} value={uf}>
+                    {uf}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="matricula">Matrícula</Label>
