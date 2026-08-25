@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import {
+  ESTADOS_UF,
+  formatarCep,
   STATUS_LABEL,
   TIPO_IMOVEL_LABEL,
   TIPO_NEGOCIACAO_LABEL,
@@ -33,6 +35,12 @@ type FormState = Pick<
   | "vendedores"
   | "compradores"
   | "imovel"
+  | "endereco"
+  | "numero_casa"
+  | "bairro"
+  | "cep"
+  | "cidade"
+  | "estado"
   | "matricula"
   | "cif"
   | "tipo_imovel"
@@ -45,6 +53,12 @@ const vazio: FormState = {
   vendedores: "",
   compradores: "",
   imovel: "",
+  endereco: "",
+  numero_casa: "",
+  bairro: "",
+  cep: "",
+  cidade: "",
+  estado: "",
   matricula: "",
   cif: "",
   tipo_imovel: "casa",
