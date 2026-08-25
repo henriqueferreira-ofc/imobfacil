@@ -129,6 +129,7 @@ function ConsultaProtocolo() {
                 <Campo label="CEP" valor={data.cep} />
                 <Campo label="Cidade" valor={data.cidade} />
                 <Campo label="Estado" valor={data.estado} />
+              </dl>
             </section>
 
             <section className="shadow-soft rounded-3xl border bg-card p-6 sm:p-8">
