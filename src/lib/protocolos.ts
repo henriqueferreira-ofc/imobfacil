@@ -7,7 +7,7 @@ export interface Protocolo {
   numero: string;
   vendedores: string;
   compradores: string;
-  imovel: string;
+  
   endereco: string;
   numero_casa: string;
   bairro: string;
