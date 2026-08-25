@@ -115,8 +115,11 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="flex min-h-screen flex-col">
         {children}
+        <footer className="mt-auto border-t border-border py-6 text-center text-sm text-muted-foreground">
+          Todos os direitos reservados a ImobFácil
+        </footer>
         <Scripts />
       </body>
     </html>
