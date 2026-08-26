@@ -256,49 +256,9 @@ function Admin() {
               onExcluir={setParaExcluir}
             />
           ) : moduloAtivo === "locacao" ? (
-            <ModeloModule
-              title="Locação de Imóveis"
-              description="Controle contratos, ocupação, garantias, vencimentos e vistoria de imóveis alugados."
-              stats={[
-                { label: "Contratos", valor: 0 },
-                { label: "Disponíveis", valor: 0 },
-                { label: "Vistorias", valor: 0 },
-                { label: "Vencendo", valor: 0 },
-              ]}
-              fields={[
-                "Imóvel para locação",
-                "Proprietário",
-                "Locatário",
-                "Valor do aluguel",
-                "Garantia",
-                "Início do contrato",
-                "Vencimento mensal",
-                "Status da vistoria",
-              ]}
-              activities={[]}
-            />
+            <LocacaoModule />
           ) : (
-            <ModeloModule
-              title="Administração de Imóveis"
-              description="Organize imóveis administrados, repasses, manutenções, documentos e relacionamento com proprietários."
-              stats={[
-                { label: "Imóveis", valor: 0 },
-                { label: "Repasses", valor: 0 },
-                { label: "Manutenções", valor: 0 },
-                { label: "Pendências", valor: 0 },
-              ]}
-              fields={[
-                "Imóvel administrado",
-                "Proprietário",
-                "Responsável interno",
-                "Taxa de administração",
-                "Repasse previsto",
-                "Condomínio/IPTU",
-                "Manutenção aberta",
-                "Observações do proprietário",
-              ]}
-              activities={[]}
-            />
+            <AdministracaoModule />
           )}
         </main>
       </div>
