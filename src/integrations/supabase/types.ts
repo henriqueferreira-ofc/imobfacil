@@ -14,6 +14,102 @@ export type Database = {
   }
   public: {
     Tables: {
+      imoveis_administrados: {
+        Row: {
+          condominio_iptu: string
+          created_at: string
+          created_by: string | null
+          id: string
+          imovel: string
+          manutencao_aberta: string
+          observacoes: string
+          proprietario: string
+          repasse_previsto: number
+          responsavel: string
+          status: string
+          taxa_administracao: number
+          updated_at: string
+        }
+        Insert: {
+          condominio_iptu?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          imovel?: string
+          manutencao_aberta?: string
+          observacoes?: string
+          proprietario?: string
+          repasse_previsto?: number
+          responsavel?: string
+          status?: string
+          taxa_administracao?: number
+          updated_at?: string
+        }
+        Update: {
+          condominio_iptu?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          imovel?: string
+          manutencao_aberta?: string
+          observacoes?: string
+          proprietario?: string
+          repasse_previsto?: number
+          responsavel?: string
+          status?: string
+          taxa_administracao?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      locacoes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          garantia: string
+          id: string
+          imovel: string
+          inicio_contrato: string | null
+          locatario: string
+          observacoes: string
+          proprietario: string
+          status_vistoria: string
+          updated_at: string
+          valor_aluguel: number
+          vencimento_dia: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          garantia?: string
+          id?: string
+          imovel?: string
+          inicio_contrato?: string | null
+          locatario?: string
+          observacoes?: string
+          proprietario?: string
+          status_vistoria?: string
+          updated_at?: string
+          valor_aluguel?: number
+          vencimento_dia?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          garantia?: string
+          id?: string
+          imovel?: string
+          inicio_contrato?: string | null
+          locatario?: string
+          observacoes?: string
+          proprietario?: string
+          status_vistoria?: string
+          updated_at?: string
+          valor_aluguel?: number
+          vencimento_dia?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
