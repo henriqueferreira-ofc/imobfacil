@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { formatarData } from "@/lib/protocolos";
+import { enderecoCompleto, formatarData } from "@/lib/protocolos";
 import { formatarMoeda, type ImovelAdministrado, type Locacao } from "@/lib/imoveis";
 
 function ModuleShell({
