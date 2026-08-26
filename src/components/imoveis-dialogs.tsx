@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { ESTADOS_UF, formatarCep } from "@/lib/protocolos";
 import {
   STATUS_VISTORIA_LABEL,
   type ImovelAdministrado,
@@ -28,7 +29,12 @@ import {
 } from "@/lib/imoveis";
 
 type LocacaoForm = {
-  imovel: string;
+  endereco: string;
+  numero_casa: string;
+  bairro: string;
+  cep: string;
+  cidade: string;
+  estado: string;
   proprietario: string;
   locatario: string;
   valor_aluguel: string;
@@ -40,7 +46,12 @@ type LocacaoForm = {
 };
 
 const locacaoVazia: LocacaoForm = {
-  imovel: "",
+  endereco: "",
+  numero_casa: "",
+  bairro: "",
+  cep: "",
+  cidade: "",
+  estado: "",
   proprietario: "",
   locatario: "",
   valor_aluguel: "",
@@ -68,7 +79,12 @@ export function LocacaoDialog({
     setForm(
       registro
         ? {
-            imovel: registro.imovel ?? "",
+            endereco: registro.endereco ?? "",
+            numero_casa: registro.numero_casa ?? "",
+            bairro: registro.bairro ?? "",
+            cep: registro.cep ?? "",
+            cidade: registro.cidade ?? "",
+            estado: registro.estado ?? "",
             proprietario: registro.proprietario ?? "",
             locatario: registro.locatario ?? "",
             valor_aluguel: String(registro.valor_aluguel ?? ""),
@@ -85,7 +101,12 @@ export function LocacaoDialog({
   const salvar = useMutation({
     mutationFn: async () => {
       const payload = {
-        imovel: form.imovel,
+        endereco: form.endereco,
+        numero_casa: form.numero_casa,
+        bairro: form.bairro,
+        cep: form.cep,
+        cidade: form.cidade,
+        estado: form.estado,
         proprietario: form.proprietario,
         locatario: form.locatario,
         valor_aluguel: Number(form.valor_aluguel.replace(",", ".")) || 0,
@@ -134,15 +155,68 @@ export function LocacaoDialog({
             salvar.mutate();
           }}
         >
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="loc-imovel">Imóvel para locação</Label>
-            <Input
-              id="loc-imovel"
-              value={form.imovel}
-              onChange={(e) => set("imovel", e.target.value)}
-              placeholder="Rua, número, bairro, cidade"
-              required
-            />
+          <div className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:col-span-2 sm:grid-cols-2">
+            <p className="text-muted-foreground text-xs font-semibold uppercase tracking-[0.18em] sm:col-span-2">
+              Imóvel para locação
+            </p>
+            <div className="space-y-1.5">
+              <Label htmlFor="loc-endereco">Endereço (rua/avenida)</Label>
+              <Input
+                id="loc-endereco"
+                value={form.endereco}
+                onChange={(e) => set("endereco", e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="loc-numero">Número</Label>
+              <Input
+                id="loc-numero"
+                value={form.numero_casa}
+                onChange={(e) => set("numero_casa", e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="loc-bairro">Bairro</Label>
+              <Input
+                id="loc-bairro"
+                value={form.bairro}
+                onChange={(e) => set("bairro", e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="loc-cep">CEP</Label>
+              <Input
+                id="loc-cep"
+                value={form.cep}
+                onChange={(e) => set("cep", formatarCep(e.target.value))}
+                placeholder="00000-000"
+                inputMode="numeric"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="loc-cidade">Cidade</Label>
+              <Input
+                id="loc-cidade"
+                value={form.cidade}
+                onChange={(e) => set("cidade", e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Estado (UF)</Label>
+              <Select value={form.estado} onValueChange={(v) => set("estado", v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="UF" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ESTADOS_UF.map((uf) => (
+                    <SelectItem key={uf} value={uf}>
+                      {uf}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="loc-prop">Proprietário</Label>

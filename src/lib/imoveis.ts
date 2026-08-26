@@ -9,6 +9,12 @@ export const STATUS_VISTORIA_LABEL: Record<string, string> = {
 export interface Locacao {
   id: string;
   imovel: string;
+  endereco: string;
+  numero_casa: string;
+  bairro: string;
+  cep: string;
+  cidade: string;
+  estado: string;
   proprietario: string;
   locatario: string;
   valor_aluguel: number;
