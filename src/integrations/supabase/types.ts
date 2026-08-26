@@ -64,13 +64,19 @@ export type Database = {
       }
       locacoes: {
         Row: {
+          bairro: string
+          cep: string
+          cidade: string
           created_at: string
           created_by: string | null
+          endereco: string
+          estado: string
           garantia: string
           id: string
           imovel: string
           inicio_contrato: string | null
           locatario: string
+          numero_casa: string
           observacoes: string
           proprietario: string
           status_vistoria: string
@@ -79,13 +85,19 @@ export type Database = {
           vencimento_dia: number
         }
         Insert: {
+          bairro?: string
+          cep?: string
+          cidade?: string
           created_at?: string
           created_by?: string | null
+          endereco?: string
+          estado?: string
           garantia?: string
           id?: string
           imovel?: string
           inicio_contrato?: string | null
           locatario?: string
+          numero_casa?: string
           observacoes?: string
           proprietario?: string
           status_vistoria?: string
@@ -94,13 +106,19 @@ export type Database = {
           vencimento_dia?: number
         }
         Update: {
+          bairro?: string
+          cep?: string
+          cidade?: string
           created_at?: string
           created_by?: string | null
+          endereco?: string
+          estado?: string
           garantia?: string
           id?: string
           imovel?: string
           inicio_contrato?: string | null
           locatario?: string
+          numero_casa?: string
           observacoes?: string
           proprietario?: string
           status_vistoria?: string

@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { formatarData } from "@/lib/protocolos";
+import { enderecoCompleto, formatarData } from "@/lib/protocolos";
 import { formatarMoeda, type ImovelAdministrado, type Locacao } from "@/lib/imoveis";
 
 function ModuleShell({
@@ -175,7 +175,8 @@ export function LocacaoModule() {
     const lista = data ?? [];
     if (!termo) return lista;
     return lista.filter((l) =>
-      [l.imovel, l.proprietario, l.locatario, l.garantia].join(" ").toLowerCase().includes(termo),
+      [l.endereco, l.numero_casa, l.bairro, l.cep, l.cidade, l.estado, l.proprietario, l.locatario, l.garantia]
+        .join(" ").toLowerCase().includes(termo),
     );
   }, [data, busca]);
 
@@ -222,7 +223,7 @@ export function LocacaoModule() {
           filtrados.map((l) => (
             <article key={l.id} className="shadow-soft rounded-2xl border bg-card p-4 sm:p-5">
               <CardHeaderRow
-                titulo={l.imovel || "Imóvel não informado"}
+                titulo={enderecoCompleto(l) || "Imóvel não informado"}
                 status={l.status_vistoria}
                 onEditar={() => {
                   setEmEdicao(l);
