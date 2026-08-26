@@ -4,7 +4,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   Building2,
-  ClipboardList,
   ExternalLink,
   FileText,
   Home,
@@ -18,6 +17,7 @@ import {
 } from "lucide-react";
 import { Logo, StatusBadge } from "@/components/brand";
 import { ProtocoloDialog } from "@/components/protocolo-dialog";
+import { AdministracaoModule, LocacaoModule } from "@/components/imoveis-modules";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -256,49 +256,9 @@ function Admin() {
               onExcluir={setParaExcluir}
             />
           ) : moduloAtivo === "locacao" ? (
-            <ModeloModule
-              title="Locação de Imóveis"
-              description="Controle contratos, ocupação, garantias, vencimentos e vistoria de imóveis alugados."
-              stats={[
-                { label: "Contratos", valor: 0 },
-                { label: "Disponíveis", valor: 0 },
-                { label: "Vistorias", valor: 0 },
-                { label: "Vencendo", valor: 0 },
-              ]}
-              fields={[
-                "Imóvel para locação",
-                "Proprietário",
-                "Locatário",
-                "Valor do aluguel",
-                "Garantia",
-                "Início do contrato",
-                "Vencimento mensal",
-                "Status da vistoria",
-              ]}
-              activities={[]}
-            />
+            <LocacaoModule />
           ) : (
-            <ModeloModule
-              title="Administração de Imóveis"
-              description="Organize imóveis administrados, repasses, manutenções, documentos e relacionamento com proprietários."
-              stats={[
-                { label: "Imóveis", valor: 0 },
-                { label: "Repasses", valor: 0 },
-                { label: "Manutenções", valor: 0 },
-                { label: "Pendências", valor: 0 },
-              ]}
-              fields={[
-                "Imóvel administrado",
-                "Proprietário",
-                "Responsável interno",
-                "Taxa de administração",
-                "Repasse previsto",
-                "Condomínio/IPTU",
-                "Manutenção aberta",
-                "Observações do proprietário",
-              ]}
-              activities={[]}
-            />
+            <AdministracaoModule />
           )}
         </main>
       </div>
@@ -520,99 +480,5 @@ function ProtocolosModule({
         )}
       </div>
     </>
-  );
-}
-
-function ModeloModule({
-  title,
-  description,
-  stats,
-  fields,
-  activities,
-}: {
-  title: string;
-  description: string;
-  stats: Array<{ label: string; valor: number }>;
-  fields: string[];
-  activities: string[];
-}) {
-  return (
-    <div className="space-y-5">
-      <div>
-        <p className="text-eyebrow text-muted-foreground">Módulo administrativo</p>
-        <h1 className="mt-2 font-display text-xl font-bold sm:text-2xl">{title}</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          {description}
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 lg:grid-cols-4">
-        {stats.map((item) => (
-          <div key={item.label} className="shadow-soft rounded-2xl border bg-card p-4">
-            <p className="text-eyebrow text-muted-foreground">{item.label}</p>
-            <p className="mt-1.5 font-display text-xl font-bold sm:text-2xl">{item.valor}</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)]">
-        <section className="shadow-soft rounded-2xl border bg-card p-4 sm:p-5">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h2 className="font-display text-lg font-bold">Novo cadastro</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Modelo inicial para organizar as informações deste módulo.
-              </p>
-            </div>
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
-              <ClipboardList className="size-5" />
-            </span>
-          </div>
-
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            {fields.map((field) => (
-              <div key={field} className="space-y-1.5">
-                <label className="text-sm font-medium">{field}</label>
-                <Input placeholder={field} />
-              </div>
-            ))}
-            <div className="space-y-1.5 sm:col-span-2">
-              <label className="text-sm font-medium">Histórico e observações</label>
-              <textarea
-                className="min-h-28 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20"
-                placeholder="Registre movimentações, pendências e próximos passos."
-              />
-            </div>
-          </div>
-
-          <div className="mt-5 flex justify-stretch sm:justify-end">
-            <Button type="button" className="w-full sm:w-auto">
-              <Plus className="size-4" />
-              Salvar cadastro
-            </Button>
-          </div>
-        </section>
-
-        <section className="shadow-soft rounded-2xl border bg-card p-4 sm:p-5">
-          <h2 className="font-display text-lg font-bold">Acompanhamento</h2>
-          {activities.length === 0 ? (
-            <div className="mt-4 rounded-xl border border-dashed bg-background/60 px-4 py-10 text-center">
-              <p className="text-sm text-muted-foreground">
-                Nenhum acompanhamento cadastrado neste módulo.
-              </p>
-            </div>
-          ) : (
-            <div className="mt-4 space-y-3">
-              {activities.map((activity) => (
-                <div key={activity} className="rounded-xl border bg-background p-3">
-                  <p className="text-sm font-medium">{activity}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">Atualizado em 25/08/2026</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-      </div>
-    </div>
   );
 }
