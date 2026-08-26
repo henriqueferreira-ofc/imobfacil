@@ -81,8 +81,8 @@ function Home() {
               Consulte o andamento da sua negociação
             </h1>
             <p className="mt-3 max-w-xl text-sm text-primary-foreground/80 sm:mt-4 sm:text-base">
-              Informe o número do protocolo entregue pelo corretor e veja imóvel, partes
-              envolvidas, tipo de negociação e todo o histórico atualizado.
+              Informe o número do protocolo entregue pelo corretor e veja imóvel, partes envolvidas,
+              tipo de negociação e todo o histórico atualizado.
             </p>
 
             <form onSubmit={consultar} className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row">
@@ -93,7 +93,12 @@ function Home() {
                 aria-label="Número do protocolo"
                 className="h-12 w-full border-transparent bg-card text-base text-foreground placeholder:text-muted-foreground sm:max-w-xs"
               />
-              <Button type="submit" size="lg" variant="secondary" className="h-12 w-full font-semibold sm:w-auto">
+              <Button
+                type="submit"
+                size="lg"
+                variant="secondary"
+                className="h-12 w-full font-semibold sm:w-auto"
+              >
                 Consultar protocolo
                 <ArrowRight className="size-4" />
               </Button>
@@ -118,12 +123,11 @@ function Home() {
       </main>
 
       <footer className="border-t py-8">
-        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-2 px-4 text-xs sm:px-6 text-muted-foreground sm:flex-row sm:items-center">
-          <div>
-            <span className="font-semibold text-foreground">ImobFácil</span>
-            <span className="ml-1">Protocolos de compra e venda de casas, lotes e apartamentos.</span>
-          </div>
-          <span>© 2026 Todos os Direitos reservados a <strong className="font-semibold text-foreground">ImobFácil</strong></span>
+        <div className="mx-auto flex max-w-6xl justify-center px-4 text-center text-xs text-muted-foreground sm:px-6 lg:justify-end lg:text-right">
+          <span>
+            © 2026 Todos os Direitos reservados a{" "}
+            <strong className="font-semibold text-foreground">ImobFácil</strong>
+          </span>
         </div>
       </footer>
     </div>

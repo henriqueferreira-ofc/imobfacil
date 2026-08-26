@@ -1,16 +1,34 @@
 import { Link } from "@tanstack/react-router";
-import logoAsset from "@/assets/imobfacil-logo.png.asset.json";
+import { useState } from "react";
 import { STATUS_LABEL } from "@/lib/protocolos";
 import { cn } from "@/lib/utils";
 
+const LOGO_SRC = "/icon-512.png";
+
 export function Logo({ className }: { className?: string }) {
+  const [hasImageError, setHasImageError] = useState(false);
+
   return (
-    <img
-      src={logoAsset.url}
-      alt="ImobFácil"
-      className={cn("size-11 shrink-0 rounded-xl object-cover shadow-soft sm:size-14", className)}
-      loading="eager"
-    />
+    <span
+      className={cn(
+        "shadow-soft flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-card sm:size-14",
+        className,
+      )}
+    >
+      {hasImageError ? (
+        <span className="font-display text-sm font-bold text-brand-deep sm:text-base">
+          Imob<span className="text-brand-bright">F</span>
+        </span>
+      ) : (
+        <img
+          src={LOGO_SRC}
+          alt="ImobFácil"
+          className="h-full w-full object-cover"
+          loading="eager"
+          onError={() => setHasImageError(true)}
+        />
+      )}
+    </span>
   );
 }
 
