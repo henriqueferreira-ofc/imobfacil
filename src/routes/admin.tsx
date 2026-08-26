@@ -2,12 +2,32 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ExternalLink, LogOut, Pencil, Plus, Search, ShieldAlert, Trash2 } from "lucide-react";
-import { StatusBadge, Wordmark } from "@/components/brand";
+import {
+  Building2,
+  ClipboardList,
+  ExternalLink,
+  FileText,
+  Home,
+  LogOut,
+  Menu,
+  Pencil,
+  Plus,
+  Search,
+  ShieldAlert,
+  Trash2,
+} from "lucide-react";
+import { Logo, StatusBadge } from "@/components/brand";
 import { ProtocoloDialog } from "@/components/protocolo-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,14 +40,42 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin, useSession } from "@/hooks/useSession";
+import { cn } from "@/lib/utils";
 import {
   enderecoCompleto,
   formatarData,
-  STATUS_LABEL,
   TIPO_IMOVEL_LABEL,
   TIPO_NEGOCIACAO_LABEL,
   type Protocolo,
 } from "@/lib/protocolos";
+
+type AdminModulo = "protocolos" | "locacao" | "administracao";
+
+const modulos: Array<{
+  id: AdminModulo;
+  label: string;
+  description: string;
+  icon: typeof FileText;
+}> = [
+  {
+    id: "protocolos",
+    label: "Protocolo de Documentos",
+    description: "Cadastro e consulta pública",
+    icon: FileText,
+  },
+  {
+    id: "locacao",
+    label: "Locação de Imóveis",
+    description: "Contratos, vistoria e aluguel",
+    icon: Home,
+  },
+  {
+    id: "administracao",
+    label: "Administração de Imóveis",
+    description: "Gestão, repasses e manutenção",
+    icon: Building2,
+  },
+];
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -55,6 +103,8 @@ function Admin() {
   const [dialogAberto, setDialogAberto] = useState(false);
   const [emEdicao, setEmEdicao] = useState<Protocolo | null>(null);
   const [paraExcluir, setParaExcluir] = useState<Protocolo | null>(null);
+  const [moduloAtivo, setModuloAtivo] = useState<AdminModulo>("protocolos");
+  const [menuAberto, setMenuAberto] = useState(false);
 
   useEffect(() => {
     if (!loading && !session) navigate({ to: "/auth", replace: true });
@@ -154,156 +204,122 @@ function Admin() {
   };
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b bg-card">
-        <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:px-6 sm:py-4">
-          <Wordmark subtitle="Painel administrativo" />
-          <div className="flex shrink-0 items-center gap-2">
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/">
-                <ExternalLink className="size-4" />
-                <span className="hidden sm:inline">Consulta pública</span>
-              </Link>
-            </Button>
-            <Button variant="ghost" size="sm" onClick={sair}>
-              <LogOut className="size-4" />
-              <span className="hidden sm:inline">Sair</span>
-            </Button>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-dvh overflow-x-hidden lg:grid lg:grid-cols-[292px_minmax(0,1fr)]">
+      <aside className="hidden bg-card lg:fixed lg:inset-y-0 lg:left-0 lg:block lg:w-[292px] lg:border-r">
+        <AdminSidebar moduloAtivo={moduloAtivo} onModuloChange={setModuloAtivo} />
+      </aside>
 
-      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {[
-            { label: "Protocolos", valor: totais.total },
-            { label: "Em andamento", valor: totais.andamento },
-            { label: "Em análise", valor: totais.analise },
-            { label: "Concluídos", valor: totais.concluidos },
-          ].map((item) => (
-            <div key={item.label} className="shadow-soft rounded-2xl border bg-card p-4">
-              <p className="text-eyebrow text-muted-foreground">{item.label}</p>
-              <p className="mt-1.5 font-display text-xl font-bold sm:text-2xl">{item.valor}</p>
+      <div className="min-w-0 lg:col-start-2">
+        <header className="border-b bg-background/80 backdrop-blur">
+          <div className="flex min-h-16 items-center justify-between gap-2 px-4 sm:px-6 lg:justify-end lg:px-10">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              aria-label="Abrir menu"
+              onClick={() => setMenuAberto(true)}
+            >
+              <Menu className="size-5" />
+            </Button>
+
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/">
+                  <ExternalLink className="size-4" />
+                  <span className="hidden sm:inline">Consulta pública</span>
+                </Link>
+              </Button>
+              <Button variant="ghost" size="sm" onClick={sair}>
+                <LogOut className="size-4" />
+                <span className="hidden sm:inline">Sair</span>
+              </Button>
             </div>
-          ))}
-        </div>
+          </div>
+        </header>
 
-        <div className="mt-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-          <div className="relative min-w-0">
-            <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              placeholder="Buscar protocolo, parte, endereço..."
-              className="pl-9"
+        <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
+          {moduloAtivo === "protocolos" ? (
+            <ProtocolosModule
+              busca={busca}
+              setBusca={setBusca}
+              totais={totais}
+              isLoading={isLoading}
+              filtrados={filtrados}
+              onNovo={() => {
+                setEmEdicao(null);
+                setDialogAberto(true);
+              }}
+              onEditar={(protocolo) => {
+                setEmEdicao(protocolo);
+                setDialogAberto(true);
+              }}
+              onExcluir={setParaExcluir}
             />
-          </div>
-          <Button
-            className="shrink-0"
-            onClick={() => {
-              setEmEdicao(null);
-              setDialogAberto(true);
-            }}
-          >
-            <Plus className="size-4" />
-            <span className="hidden sm:inline">Novo protocolo</span>
-          </Button>
-        </div>
-
-        <div className="mt-4 space-y-3">
-          {isLoading ? (
-            <>
-              <Skeleton className="h-28 rounded-2xl" />
-              <Skeleton className="h-28 rounded-2xl" />
-            </>
-          ) : filtrados.length === 0 ? (
-            <div className="rounded-2xl border border-dashed bg-card/50 px-6 py-14 text-center">
-              <p className="text-sm text-muted-foreground">
-                Nenhum protocolo encontrado. Cadastre o primeiro para começar.
-              </p>
-            </div>
+          ) : moduloAtivo === "locacao" ? (
+            <ModeloModule
+              title="Locação de Imóveis"
+              description="Controle contratos, ocupação, garantias, vencimentos e vistoria de imóveis alugados."
+              stats={[
+                { label: "Contratos", valor: 0 },
+                { label: "Disponíveis", valor: 0 },
+                { label: "Vistorias", valor: 0 },
+                { label: "Vencendo", valor: 0 },
+              ]}
+              fields={[
+                "Imóvel para locação",
+                "Proprietário",
+                "Locatário",
+                "Valor do aluguel",
+                "Garantia",
+                "Início do contrato",
+                "Vencimento mensal",
+                "Status da vistoria",
+              ]}
+              activities={[]}
+            />
           ) : (
-            filtrados.map((p) => (
-              <article key={p.id} className="shadow-soft rounded-2xl border bg-card p-4 sm:p-5">
-                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="font-display text-base font-bold sm:text-lg">{p.numero}</h2>
-                      <StatusBadge status={p.status} />
-                    </div>
-                    <p className="mt-1 truncate text-sm text-muted-foreground">
-                      {enderecoCompleto(p) || "Endereço não informado"}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Editar protocolo"
-                      onClick={() => {
-                        setEmEdicao(p);
-                        setDialogAberto(true);
-                      }}
-                    >
-                      <Pencil className="size-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Excluir protocolo"
-                      onClick={() => setParaExcluir(p)}
-                    >
-                      <Trash2 className="size-4 text-destructive" />
-                    </Button>
-                  </div>
-                </div>
-
-                <dl className="mt-4 grid grid-cols-2 gap-3 text-sm lg:grid-cols-4">
-                  <div className="min-w-0">
-                    <dt className="text-eyebrow text-muted-foreground">Vendedor(es)</dt>
-                    <dd className="truncate">{p.vendedores || "—"}</dd>
-                  </div>
-                  <div className="min-w-0">
-                    <dt className="text-eyebrow text-muted-foreground">Comprador(es)</dt>
-                    <dd className="truncate">{p.compradores || "—"}</dd>
-                  </div>
-                  <div className="min-w-0">
-                    <dt className="text-eyebrow text-muted-foreground">Tipo</dt>
-                    <dd className="truncate">
-                      {TIPO_IMOVEL_LABEL[p.tipo_imovel]} •{" "}
-                      {TIPO_NEGOCIACAO_LABEL[p.tipo_negociacao]}
-                    </dd>
-                  </div>
-                  <div className="min-w-0">
-                    <dt className="text-eyebrow text-muted-foreground">Atualizado</dt>
-                    <dd className="truncate">{formatarData(p.updated_at)}</dd>
-                  </div>
-                </dl>
-
-                <div className="mt-4 flex flex-wrap gap-2 border-t pt-3 text-xs text-muted-foreground">
-                  <span>Matrícula {p.matricula || "—"}</span>
-                  <span>•</span>
-                  <span>CIF {p.cif || "—"}</span>
-                  <span>•</span>
-                  <Link
-                    to="/p/$numero"
-                    params={{ numero: p.numero }}
-                    className="font-medium text-brand-bright hover:underline"
-                  >
-                    Ver consulta pública
-                  </Link>
-                </div>
-              </article>
-            ))
+            <ModeloModule
+              title="Administração de Imóveis"
+              description="Organize imóveis administrados, repasses, manutenções, documentos e relacionamento com proprietários."
+              stats={[
+                { label: "Imóveis", valor: 0 },
+                { label: "Repasses", valor: 0 },
+                { label: "Manutenções", valor: 0 },
+                { label: "Pendências", valor: 0 },
+              ]}
+              fields={[
+                "Imóvel administrado",
+                "Proprietário",
+                "Responsável interno",
+                "Taxa de administração",
+                "Repasse previsto",
+                "Condomínio/IPTU",
+                "Manutenção aberta",
+                "Observações do proprietário",
+              ]}
+              activities={[]}
+            />
           )}
-        </div>
-      </main>
+        </main>
+      </div>
 
-      <ProtocoloDialog
-        open={dialogAberto}
-        onOpenChange={setDialogAberto}
-        protocolo={emEdicao}
-      />
+      <Sheet open={menuAberto} onOpenChange={setMenuAberto}>
+        <SheetContent side="left" className="w-[min(82vw,320px)] p-0">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Menu administrativo</SheetTitle>
+            <SheetDescription>Escolha um módulo do painel administrativo.</SheetDescription>
+          </SheetHeader>
+          <AdminSidebar
+            moduloAtivo={moduloAtivo}
+            onModuloChange={(modulo) => {
+              setModuloAtivo(modulo);
+              setMenuAberto(false);
+            }}
+          />
+        </SheetContent>
+      </Sheet>
+
+      <ProtocoloDialog open={dialogAberto} onOpenChange={setDialogAberto} protocolo={emEdicao} />
 
       <AlertDialog open={Boolean(paraExcluir)} onOpenChange={() => setParaExcluir(null)}>
         <AlertDialogContent>
@@ -325,4 +341,278 @@ function Admin() {
   );
 }
 
-export const statusLabels = STATUS_LABEL;
+function AdminSidebar({
+  moduloAtivo,
+  onModuloChange,
+}: {
+  moduloAtivo: AdminModulo;
+  onModuloChange: (modulo: AdminModulo) => void;
+}) {
+  return (
+    <div className="flex h-full flex-col bg-card px-4 py-5 lg:overflow-y-auto lg:px-5">
+      <div className="flex items-center gap-3 rounded-xl px-1">
+        <Logo className="size-14 rounded-2xl" />
+        <span className="min-w-0">
+          <span className="block truncate font-display text-xl font-bold leading-none">
+            Imob<span className="text-brand-bright">Fácil</span>
+          </span>
+          <span className="mt-1 block truncate text-sm text-muted-foreground">
+            Painel administrativo
+          </span>
+        </span>
+      </div>
+
+      <nav className="mt-8 flex flex-col gap-2">
+        {modulos.map(({ id, label, icon: Icon }) => {
+          const active = moduloAtivo === id;
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => onModuloChange(id)}
+              className={cn(
+                "flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-base font-semibold text-foreground transition hover:bg-secondary lg:text-sm",
+                active && "bg-secondary text-secondary-foreground",
+              )}
+            >
+              <Icon className="size-5 shrink-0" />
+              <span className="min-w-0 leading-tight">{label}</span>
+            </button>
+          );
+        })}
+      </nav>
+    </div>
+  );
+}
+
+function ProtocolosModule({
+  busca,
+  setBusca,
+  totais,
+  isLoading,
+  filtrados,
+  onNovo,
+  onEditar,
+  onExcluir,
+}: {
+  busca: string;
+  setBusca: (busca: string) => void;
+  totais: { total: number; andamento: number; analise: number; concluidos: number };
+  isLoading: boolean;
+  filtrados: Protocolo[];
+  onNovo: () => void;
+  onEditar: (protocolo: Protocolo) => void;
+  onExcluir: (protocolo: Protocolo) => void;
+}) {
+  return (
+    <>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {[
+          { label: "Protocolos", valor: totais.total },
+          { label: "Em andamento", valor: totais.andamento },
+          { label: "Em análise", valor: totais.analise },
+          { label: "Concluídos", valor: totais.concluidos },
+        ].map((item) => (
+          <div key={item.label} className="shadow-soft rounded-2xl border bg-card p-4">
+            <p className="text-eyebrow text-muted-foreground">{item.label}</p>
+            <p className="mt-1.5 font-display text-xl font-bold sm:text-2xl">{item.valor}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+        <div className="relative min-w-0">
+          <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            placeholder="Buscar protocolo, parte, endereço..."
+            className="pl-9"
+          />
+        </div>
+        <Button className="size-12 shrink-0 px-0 sm:size-auto sm:px-4" onClick={onNovo}>
+          <Plus className="size-4" />
+          <span className="hidden sm:inline">Novo protocolo</span>
+        </Button>
+      </div>
+
+      <div className="mt-4 space-y-3">
+        {isLoading ? (
+          <>
+            <Skeleton className="h-28 rounded-2xl" />
+            <Skeleton className="h-28 rounded-2xl" />
+          </>
+        ) : filtrados.length === 0 ? (
+          <div className="rounded-2xl border border-dashed bg-card/50 px-6 py-14 text-center">
+            <p className="text-sm text-muted-foreground">
+              Nenhum protocolo encontrado. Cadastre o primeiro para começar.
+            </p>
+          </div>
+        ) : (
+          filtrados.map((p) => (
+            <article key={p.id} className="shadow-soft rounded-2xl border bg-card p-4 sm:p-5">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="font-display text-base font-bold sm:text-lg">{p.numero}</h2>
+                    <StatusBadge status={p.status} />
+                  </div>
+                  <p className="mt-1 truncate text-sm text-muted-foreground">
+                    {enderecoCompleto(p) || "Endereço não informado"}
+                  </p>
+                </div>
+                <div className="flex shrink-0 gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Editar protocolo"
+                    onClick={() => onEditar(p)}
+                  >
+                    <Pencil className="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Excluir protocolo"
+                    onClick={() => onExcluir(p)}
+                  >
+                    <Trash2 className="size-4 text-destructive" />
+                  </Button>
+                </div>
+              </div>
+
+              <dl className="mt-4 grid grid-cols-2 gap-4 text-sm lg:grid-cols-4">
+                <div className="min-w-0">
+                  <dt className="text-eyebrow text-muted-foreground">Vendedor(es)</dt>
+                  <dd className="line-clamp-2">{p.vendedores || "—"}</dd>
+                </div>
+                <div className="min-w-0">
+                  <dt className="text-eyebrow text-muted-foreground">Comprador(es)</dt>
+                  <dd className="line-clamp-2">{p.compradores || "—"}</dd>
+                </div>
+                <div className="min-w-0">
+                  <dt className="text-eyebrow text-muted-foreground">Tipo</dt>
+                  <dd className="line-clamp-2">
+                    {TIPO_IMOVEL_LABEL[p.tipo_imovel]} • {TIPO_NEGOCIACAO_LABEL[p.tipo_negociacao]}
+                  </dd>
+                </div>
+                <div className="min-w-0">
+                  <dt className="text-eyebrow text-muted-foreground">Atualizado</dt>
+                  <dd className="truncate">{formatarData(p.updated_at)}</dd>
+                </div>
+              </dl>
+
+              <div className="mt-4 flex flex-wrap gap-2 border-t pt-3 text-xs text-muted-foreground">
+                <span>Matrícula {p.matricula || "—"}</span>
+                <span>•</span>
+                <span>CIF {p.cif || "—"}</span>
+                <span>•</span>
+                <Link
+                  to="/p/$numero"
+                  params={{ numero: p.numero }}
+                  className="font-medium text-brand-bright hover:underline"
+                >
+                  Ver consulta pública
+                </Link>
+              </div>
+            </article>
+          ))
+        )}
+      </div>
+    </>
+  );
+}
+
+function ModeloModule({
+  title,
+  description,
+  stats,
+  fields,
+  activities,
+}: {
+  title: string;
+  description: string;
+  stats: Array<{ label: string; valor: number }>;
+  fields: string[];
+  activities: string[];
+}) {
+  return (
+    <div className="space-y-5">
+      <div>
+        <p className="text-eyebrow text-muted-foreground">Módulo administrativo</p>
+        <h1 className="mt-2 font-display text-xl font-bold sm:text-2xl">{title}</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          {description}
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 lg:grid-cols-4">
+        {stats.map((item) => (
+          <div key={item.label} className="shadow-soft rounded-2xl border bg-card p-4">
+            <p className="text-eyebrow text-muted-foreground">{item.label}</p>
+            <p className="mt-1.5 font-display text-xl font-bold sm:text-2xl">{item.valor}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)]">
+        <section className="shadow-soft rounded-2xl border bg-card p-4 sm:p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="font-display text-lg font-bold">Novo cadastro</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Modelo inicial para organizar as informações deste módulo.
+              </p>
+            </div>
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
+              <ClipboardList className="size-5" />
+            </span>
+          </div>
+
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+            {fields.map((field) => (
+              <div key={field} className="space-y-1.5">
+                <label className="text-sm font-medium">{field}</label>
+                <Input placeholder={field} />
+              </div>
+            ))}
+            <div className="space-y-1.5 sm:col-span-2">
+              <label className="text-sm font-medium">Histórico e observações</label>
+              <textarea
+                className="min-h-28 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20"
+                placeholder="Registre movimentações, pendências e próximos passos."
+              />
+            </div>
+          </div>
+
+          <div className="mt-5 flex justify-stretch sm:justify-end">
+            <Button type="button" className="w-full sm:w-auto">
+              <Plus className="size-4" />
+              Salvar cadastro
+            </Button>
+          </div>
+        </section>
+
+        <section className="shadow-soft rounded-2xl border bg-card p-4 sm:p-5">
+          <h2 className="font-display text-lg font-bold">Acompanhamento</h2>
+          {activities.length === 0 ? (
+            <div className="mt-4 rounded-xl border border-dashed bg-background/60 px-4 py-10 text-center">
+              <p className="text-sm text-muted-foreground">
+                Nenhum acompanhamento cadastrado neste módulo.
+              </p>
+            </div>
+          ) : (
+            <div className="mt-4 space-y-3">
+              {activities.map((activity) => (
+                <div key={activity} className="rounded-xl border bg-background p-3">
+                  <p className="text-sm font-medium">{activity}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Atualizado em 25/08/2026</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+    </div>
+  );
+}
