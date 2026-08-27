@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Paperclip, FileCheck2, Loader2, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +23,8 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import {
+  BAIRROS,
+  BANCOS,
   ESTADOS_UF,
   formatarCep,
   STATUS_LABEL,
@@ -34,7 +37,7 @@ type FormState = Pick<
   Protocolo,
   | "vendedores"
   | "compradores"
-  | "endereco"
+  | "corretor"
   | "endereco"
   | "numero_casa"
   | "bairro"
@@ -43,6 +46,11 @@ type FormState = Pick<
   | "estado"
   | "matricula"
   | "cif"
+  | "contrato"
+  | "banco"
+  | "matricula_doc_url"
+  | "cif_doc_url"
+  | "contrato_doc_url"
   | "tipo_imovel"
   | "tipo_negociacao"
   | "status"
@@ -52,7 +60,7 @@ type FormState = Pick<
 const vazio: FormState = {
   vendedores: "",
   compradores: "",
-  
+  corretor: "",
   endereco: "",
   numero_casa: "",
   bairro: "",
@@ -61,11 +69,109 @@ const vazio: FormState = {
   estado: "",
   matricula: "",
   cif: "",
+  contrato: "",
+  banco: "",
+  matricula_doc_url: "",
+  cif_doc_url: "",
+  contrato_doc_url: "",
   tipo_imovel: "casa",
   tipo_negociacao: "a_vista",
   status: "em_andamento",
   historico: "",
 };
+
+type AnexoKey = "matricula_doc_url" | "cif_doc_url" | "contrato_doc_url";
+
+function AnexoDocumento({
+  valor,
+  onChange,
+  label,
+}: {
+  valor: string;
+  onChange: (path: string) => void;
+  label: string;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [enviando, setEnviando] = useState(false);
+
+  async function enviar(file: File) {
+    setEnviando(true);
+    const ext = file.name.split(".").pop() ?? "pdf";
+    const path = `${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from("protocolo-docs").upload(path, file);
+    setEnviando(false);
+    if (error) {
+      toast.error(`Erro ao anexar ${label}`, { description: error.message });
+      return;
+    }
+    onChange(path);
+    toast.success(`${label}: documento anexado`);
+  }
+
+  async function abrir() {
+    const { data, error } = await supabase.storage
+      .from("protocolo-docs")
+      .createSignedUrl(valor, 300);
+    if (error || !data) {
+      toast.error("Não foi possível abrir o documento");
+      return;
+    }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  }
+
+  return (
+    <div className="flex items-center gap-1">
+      <input
+        ref={inputRef}
+        type="file"
+        className="hidden"
+        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) void enviar(file);
+          e.target.value = "";
+        }}
+      />
+      {valor ? (
+        <>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => void abrir()}
+            title="Ver documento anexado"
+          >
+            <FileCheck2 className="size-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onChange("")}
+            title="Remover anexo"
+          >
+            <X className="size-4" />
+          </Button>
+        </>
+      ) : (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={enviando}
+          onClick={() => inputRef.current?.click()}
+          title={`Anexar documento de ${label}`}
+        >
+          {enviando ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Paperclip className="size-4" />
+          )}
+        </Button>
+      )}
+    </div>
+  );
+}
 
 export function ProtocoloDialog({
   open,
@@ -86,14 +192,18 @@ export function ProtocoloDialog({
 
   const salvar = useMutation({
     mutationFn: async () => {
+      const payload = {
+        ...form,
+        banco: form.tipo_negociacao === "financiamento" ? form.banco : "",
+      };
       if (protocolo) {
-        const { error } = await supabase.from("protocolos").update(form).eq("id", protocolo.id);
+        const { error } = await supabase.from("protocolos").update(payload).eq("id", protocolo.id);
         if (error) throw error;
         return protocolo.numero;
       }
       const { data, error } = await supabase
         .from("protocolos")
-        .insert(form)
+        .insert(payload)
         .select("numero")
         .single();
       if (error) throw error;
@@ -109,6 +219,10 @@ export function ProtocoloDialog({
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function setAnexo(key: AnexoKey, path: string) {
+    setForm((prev) => ({ ...prev, [key]: path }));
   }
 
   return (
@@ -150,11 +264,19 @@ export function ProtocoloDialog({
               required
             />
           </div>
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label htmlFor="corretor">Corretor responsável</Label>
+            <Input
+              id="corretor"
+              value={form.corretor}
+              onChange={(e) => set("corretor", e.target.value)}
+            />
+          </div>
 
           <div className="sm:col-span-2">
             <p className="text-eyebrow text-muted-foreground">Endereço do imóvel</p>
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 sm:col-span-2">
             <Label htmlFor="endereco">Endereço (rua/avenida)</Label>
             <Input
               id="endereco"
@@ -172,12 +294,19 @@ export function ProtocoloDialog({
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="bairro">Bairro</Label>
-            <Input
-              id="bairro"
-              value={form.bairro}
-              onChange={(e) => set("bairro", e.target.value)}
-            />
+            <Label>Bairro</Label>
+            <Select value={form.bairro} onValueChange={(v) => set("bairro", v)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o bairro" />
+              </SelectTrigger>
+              <SelectContent>
+                {BAIRROS.map((b) => (
+                  <SelectItem key={b} value={b}>
+                    {b}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="cep">CEP</Label>
@@ -212,17 +341,50 @@ export function ProtocoloDialog({
               </SelectContent>
             </Select>
           </div>
+
+          <div className="sm:col-span-2">
+            <p className="text-eyebrow text-muted-foreground">Documentos</p>
+          </div>
           <div className="space-y-1.5">
             <Label htmlFor="matricula">Matrícula</Label>
-            <Input
-              id="matricula"
-              value={form.matricula}
-              onChange={(e) => set("matricula", e.target.value)}
-            />
+            <div className="flex items-center gap-2">
+              <Input
+                id="matricula"
+                value={form.matricula}
+                onChange={(e) => set("matricula", e.target.value)}
+              />
+              <AnexoDocumento
+                label="Matrícula"
+                valor={form.matricula_doc_url}
+                onChange={(p) => setAnexo("matricula_doc_url", p)}
+              />
+            </div>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="cif">CIF</Label>
-            <Input id="cif" value={form.cif} onChange={(e) => set("cif", e.target.value)} />
+            <div className="flex items-center gap-2">
+              <Input id="cif" value={form.cif} onChange={(e) => set("cif", e.target.value)} />
+              <AnexoDocumento
+                label="CIF"
+                valor={form.cif_doc_url}
+                onChange={(p) => setAnexo("cif_doc_url", p)}
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label htmlFor="contrato">Contrato</Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="contrato"
+                value={form.contrato}
+                onChange={(e) => set("contrato", e.target.value)}
+              />
+              <AnexoDocumento
+                label="Contrato"
+                valor={form.contrato_doc_url}
+                onChange={(p) => setAnexo("contrato_doc_url", p)}
+              />
+            </div>
           </div>
 
           <div className="space-y-1.5">
@@ -261,6 +423,23 @@ export function ProtocoloDialog({
               </SelectContent>
             </Select>
           </div>
+          {form.tipo_negociacao === "financiamento" && (
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label>Banco</Label>
+              <Select value={form.banco} onValueChange={(v) => set("banco", v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o banco" />
+                </SelectTrigger>
+                <SelectContent>
+                  {BANCOS.map((b) => (
+                    <SelectItem key={b} value={b}>
+                      {b}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="space-y-1.5 sm:col-span-2">
             <Label>Status</Label>
             <Select
