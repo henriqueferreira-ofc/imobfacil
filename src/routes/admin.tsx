@@ -1074,16 +1074,48 @@ function gerarRelatorioPdf(
           <tbody>${atualizadosRows || '<tr><td colspan="4">Nenhum protocolo cadastrado.</td></tr>'}</tbody>
         </table>
 
-        <script>
-          window.addEventListener('load', () => {
-            window.print();
-          });
-        </script>
       </body>
     </html>
-  `);
-  janela.document.close();
+  `;
+
+  const iframe = document.createElement("iframe");
+  iframe.setAttribute("aria-hidden", "true");
+  iframe.style.position = "fixed";
+  iframe.style.right = "0";
+  iframe.style.bottom = "0";
+  iframe.style.width = "0";
+  iframe.style.height = "0";
+  iframe.style.border = "0";
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentDocument;
+  if (!doc) {
+    iframe.remove();
+    toast.error("Não foi possível gerar o relatório");
+    return;
+  }
+
+  doc.open();
+  doc.write(html);
+  doc.close();
+
+  const imprimir = () => {
+    try {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+      toast.success("Relatório pronto", {
+        description: 'Escolha "Salvar como PDF" na janela de impressão.',
+      });
+    } catch {
+      toast.error("Não foi possível abrir a impressão");
+    }
+    window.setTimeout(() => iframe.remove(), 60000);
+  };
+
+  if (doc.readyState === "complete") window.setTimeout(imprimir, 300);
+  else iframe.addEventListener("load", () => window.setTimeout(imprimir, 300));
 }
+
 
 function escapeHtml(value: string) {
   return value
