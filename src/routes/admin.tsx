@@ -885,13 +885,8 @@ function gerarRelatorioPdf(
   locacoes: Locacao[],
   imoveisAdministrados: ImovelAdministrado[],
 ) {
-  const janela = window.open("", "_blank", "noopener,noreferrer");
-  if (!janela) {
-    toast.error("Não foi possível abrir o relatório", {
-      description: "Permita pop-ups no navegador para gerar o PDF.",
-    });
-    return;
-  }
+  // pop-ups são bloqueados no preview/iframe: imprimimos via iframe oculto
+
 
   const hoje = new Date().toLocaleDateString("pt-BR");
   const moduleRows = analise.modulos
