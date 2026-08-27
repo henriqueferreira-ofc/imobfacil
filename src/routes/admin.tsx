@@ -925,7 +925,7 @@ function gerarRelatorioPdf(
     )
     .join("");
 
-  janela.document.write(`
+  const html = `
     <!doctype html>
     <html lang="pt-BR">
       <head>
