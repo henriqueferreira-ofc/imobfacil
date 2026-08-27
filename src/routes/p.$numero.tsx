@@ -106,9 +106,10 @@ function ConsultaProtocolo() {
               <dl className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <Campo label="Vendedor(es)" valor={data.vendedores} />
                 <Campo label="Comprador(es)" valor={data.compradores} />
-                
+                <Campo label="Corretor responsável" valor={data.corretor} />
                 <Campo label="Matrícula" valor={data.matricula} />
                 <Campo label="CIF" valor={data.cif} />
+                <Campo label="Contrato" valor={data.contrato} />
                 <Campo
                   label="Tipo de imóvel"
                   valor={TIPO_IMOVEL_LABEL[data.tipo_imovel] ?? data.tipo_imovel}
@@ -117,6 +118,10 @@ function ConsultaProtocolo() {
                   label="Tipo de negociação"
                   valor={TIPO_NEGOCIACAO_LABEL[data.tipo_negociacao] ?? data.tipo_negociacao}
                 />
+                {data.tipo_negociacao === "financiamento" && (
+                  <Campo label="Banco" valor={data.banco} />
+                )}
+
               </dl>
             </section>
 

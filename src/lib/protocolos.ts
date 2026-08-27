@@ -7,7 +7,7 @@ export interface Protocolo {
   numero: string;
   vendedores: string;
   compradores: string;
-  
+  corretor: string;
   endereco: string;
   numero_casa: string;
   bairro: string;
@@ -16,6 +16,11 @@ export interface Protocolo {
   estado: string;
   matricula: string;
   cif: string;
+  contrato: string;
+  banco: string;
+  matricula_doc_url: string;
+  cif_doc_url: string;
+  contrato_doc_url: string;
   tipo_imovel: TipoImovel;
   tipo_negociacao: TipoNegociacao;
   status: StatusProtocolo;
@@ -23,6 +28,7 @@ export interface Protocolo {
   created_at: string;
   updated_at: string;
 }
+
 
 export type ProtocoloPublico = Omit<Protocolo, "id">;
 
@@ -88,4 +94,18 @@ export function enderecoCompleto(p: {
 export const ESTADOS_UF = [
   "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR",
   "PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO",
+];
+
+export const BAIRROS = [
+  "Centro",
+  "Jardim América",
+  "Vila Nova",
+  "Setor Bela Vista",
+];
+
+export const BANCOS = [
+  "Caixa Econômica",
+  "Bradesco",
+  "Banpará",
+  "Outros",
 ];

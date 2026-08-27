@@ -885,13 +885,8 @@ function gerarRelatorioPdf(
   locacoes: Locacao[],
   imoveisAdministrados: ImovelAdministrado[],
 ) {
-  const janela = window.open("", "_blank", "noopener,noreferrer");
-  if (!janela) {
-    toast.error("Não foi possível abrir o relatório", {
-      description: "Permita pop-ups no navegador para gerar o PDF.",
-    });
-    return;
-  }
+  // pop-ups são bloqueados no preview/iframe: imprimimos via iframe oculto
+
 
   const hoje = new Date().toLocaleDateString("pt-BR");
   const moduleRows = analise.modulos
@@ -930,7 +925,7 @@ function gerarRelatorioPdf(
     )
     .join("");
 
-  janela.document.write(`
+  const html = `
     <!doctype html>
     <html lang="pt-BR">
       <head>
@@ -1079,16 +1074,48 @@ function gerarRelatorioPdf(
           <tbody>${atualizadosRows || '<tr><td colspan="4">Nenhum protocolo cadastrado.</td></tr>'}</tbody>
         </table>
 
-        <script>
-          window.addEventListener('load', () => {
-            window.print();
-          });
-        </script>
       </body>
     </html>
-  `);
-  janela.document.close();
+  `;
+
+  const iframe = document.createElement("iframe");
+  iframe.setAttribute("aria-hidden", "true");
+  iframe.style.position = "fixed";
+  iframe.style.right = "0";
+  iframe.style.bottom = "0";
+  iframe.style.width = "0";
+  iframe.style.height = "0";
+  iframe.style.border = "0";
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentDocument;
+  if (!doc) {
+    iframe.remove();
+    toast.error("Não foi possível gerar o relatório");
+    return;
+  }
+
+  doc.open();
+  doc.write(html);
+  doc.close();
+
+  const imprimir = () => {
+    try {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+      toast.success("Relatório pronto", {
+        description: 'Escolha "Salvar como PDF" na janela de impressão.',
+      });
+    } catch {
+      toast.error("Não foi possível abrir a impressão");
+    }
+    window.setTimeout(() => iframe.remove(), 60000);
+  };
+
+  if (doc.readyState === "complete") window.setTimeout(imprimir, 300);
+  else iframe.addEventListener("load", () => window.setTimeout(imprimir, 300));
 }
+
 
 function escapeHtml(value: string) {
   return value
