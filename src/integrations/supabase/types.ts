@@ -152,10 +152,15 @@ export type Database = {
       protocolos: {
         Row: {
           bairro: string
+          banco: string
           cep: string
           cidade: string
           cif: string
+          cif_doc_url: string
           compradores: string
+          contrato: string
+          contrato_doc_url: string
+          corretor: string
           created_at: string
           created_by: string | null
           endereco: string
@@ -164,6 +169,7 @@ export type Database = {
           id: string
           imovel: string
           matricula: string
+          matricula_doc_url: string
           numero: string
           numero_casa: string
           status: string
@@ -174,10 +180,15 @@ export type Database = {
         }
         Insert: {
           bairro?: string
+          banco?: string
           cep?: string
           cidade?: string
           cif?: string
+          cif_doc_url?: string
           compradores?: string
+          contrato?: string
+          contrato_doc_url?: string
+          corretor?: string
           created_at?: string
           created_by?: string | null
           endereco?: string
@@ -186,6 +197,7 @@ export type Database = {
           id?: string
           imovel?: string
           matricula?: string
+          matricula_doc_url?: string
           numero?: string
           numero_casa?: string
           status?: string
@@ -196,10 +208,15 @@ export type Database = {
         }
         Update: {
           bairro?: string
+          banco?: string
           cep?: string
           cidade?: string
           cif?: string
+          cif_doc_url?: string
           compradores?: string
+          contrato?: string
+          contrato_doc_url?: string
+          corretor?: string
           created_at?: string
           created_by?: string | null
           endereco?: string
@@ -208,6 +225,7 @@ export type Database = {
           id?: string
           imovel?: string
           matricula?: string
+          matricula_doc_url?: string
           numero?: string
           numero_casa?: string
           status?: string
@@ -248,16 +266,22 @@ export type Database = {
         Args: { p_numero: string }
         Returns: {
           bairro: string
+          banco: string
           cep: string
           cidade: string
           cif: string
+          cif_doc_url: string
           compradores: string
+          contrato: string
+          contrato_doc_url: string
+          corretor: string
           created_at: string
           endereco: string
           estado: string
           historico: string
           imovel: string
           matricula: string
+          matricula_doc_url: string
           numero: string
           numero_casa: string
           status: string
