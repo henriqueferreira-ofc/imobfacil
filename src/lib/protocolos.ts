@@ -29,7 +29,6 @@ export interface Protocolo {
   updated_at: string;
 }
 
-
 export type ProtocoloPublico = Omit<Protocolo, "id">;
 
 export const TIPO_IMOVEL_LABEL: Record<string, string> = {
@@ -92,20 +91,44 @@ export function enderecoCompleto(p: {
 }
 
 export const ESTADOS_UF = [
-  "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR",
-  "PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO",
+  "AC",
+  "AL",
+  "AP",
+  "AM",
+  "BA",
+  "CE",
+  "DF",
+  "ES",
+  "GO",
+  "MA",
+  "MT",
+  "MS",
+  "MG",
+  "PA",
+  "PB",
+  "PR",
+  "PE",
+  "PI",
+  "RJ",
+  "RN",
+  "RS",
+  "RO",
+  "RR",
+  "SC",
+  "SP",
+  "SE",
+  "TO",
 ];
 
 export const BAIRROS = [
-  "Centro",
-  "Jardim América",
-  "Vila Nova",
-  "Setor Bela Vista",
+  "Cidade Jardim",
+  "Amazônia",
+  "Parque dos Carajás",
+  "Nova Carajás",
+  "Bairros dos Minérios",
+  "Alvorá",
+  "Serra Grande",
+  "Apoena",
 ];
 
-export const BANCOS = [
-  "Caixa Econômica",
-  "Bradesco",
-  "Banpará",
-  "Outros",
-];
+export const BANCOS = ["Caixa Econômica", "Bradesco", "Banpará", "Outros"];
