@@ -95,3 +95,17 @@ export const ESTADOS_UF = [
   "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR",
   "PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO",
 ];
+
+export const BAIRROS = [
+  "Centro",
+  "Jardim América",
+  "Vila Nova",
+  "Setor Bela Vista",
+];
+
+export const BANCOS = [
+  "Caixa Econômica",
+  "Bradesco",
+  "Banpará",
+  "Outros",
+];
