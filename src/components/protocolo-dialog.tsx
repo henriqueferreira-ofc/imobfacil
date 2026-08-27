@@ -25,8 +25,6 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   BAIRROS,
   BANCOS,
-  ESTADOS_UF,
-  formatarCep,
   STATUS_LABEL,
   TIPO_IMOVEL_LABEL,
   TIPO_NEGOCIACAO_LABEL,
@@ -284,16 +282,7 @@ export function ProtocoloDialog({
               onChange={(e) => set("endereco", e.target.value)}
             />
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="numero_casa">Número</Label>
-            <Input
-              id="numero_casa"
-              value={form.numero_casa}
-              onChange={(e) => set("numero_casa", e.target.value)}
-              inputMode="numeric"
-            />
-          </div>
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 sm:col-span-2">
             <Label>Bairro</Label>
             <Select value={form.bairro} onValueChange={(v) => set("bairro", v)}>
               <SelectTrigger>
@@ -303,39 +292,6 @@ export function ProtocoloDialog({
                 {BAIRROS.map((b) => (
                   <SelectItem key={b} value={b}>
                     {b}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="cep">CEP</Label>
-            <Input
-              id="cep"
-              value={form.cep}
-              onChange={(e) => set("cep", formatarCep(e.target.value))}
-              inputMode="numeric"
-              placeholder="00000-000"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="cidade">Cidade</Label>
-            <Input
-              id="cidade"
-              value={form.cidade}
-              onChange={(e) => set("cidade", e.target.value)}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Estado (UF)</Label>
-            <Select value={form.estado} onValueChange={(v) => set("estado", v)}>
-              <SelectTrigger>
-                <SelectValue placeholder="UF" />
-              </SelectTrigger>
-              <SelectContent>
-                {ESTADOS_UF.map((uf) => (
-                  <SelectItem key={uf} value={uf}>
-                    {uf}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -474,7 +430,12 @@ export function ProtocoloDialog({
           </div>
 
           <DialogFooter className="gap-2 sm:col-span-2">
-            <Button type="button" variant="ghost" className="w-full sm:w-auto" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full sm:w-auto"
+              onClick={() => onOpenChange(false)}
+            >
               Cancelar
             </Button>
             <Button type="submit" className="w-full sm:w-auto" disabled={salvar.isPending}>
