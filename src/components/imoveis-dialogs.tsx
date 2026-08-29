@@ -340,11 +340,13 @@ export function LocacaoDialog({
               </section>
 
               <section className="relative grid gap-4 rounded-xl border bg-background/70 p-3">
-                <AnexoLocacaoDocumento
-                  label="locatário"
-                  valor={form.locatario_doc_url}
-                  onChange={(path) => setAnexo("locatario_doc_url", path)}
-                />
+                <div className="absolute right-3 top-3">
+                  <AnexoLocacaoDocumento
+                    label="locatário"
+                    valor={form.locatario_doc_url}
+                    onChange={(path) => setAnexo("locatario_doc_url", path)}
+                  />
+                </div>
                 <h3 className="text-center text-sm font-bold uppercase tracking-wide">Locatário</h3>
                 <div className="space-y-1.5">
                   <Label>Tipo de pessoa</Label>
