@@ -302,120 +302,124 @@ export function LocacaoDialog({
               Locador e Locatário
             </p>
             <div className="grid gap-4 md:grid-cols-2">
-              <section className="relative grid gap-4 rounded-xl border bg-background/70 p-3">
-                <div className="absolute right-3 top-3">
-                  <AnexoLocacaoDocumento
-                    label="locador"
-                    valor={form.proprietario_doc_url}
-                    onChange={(path) => setAnexo("proprietario_doc_url", path)}
-                  />
-                </div>
+              <div className="flex flex-col gap-2">
                 <h3 className="text-center text-sm font-bold uppercase tracking-wide">Locador</h3>
-                <div className="space-y-1.5">
-                  <Label htmlFor="loc-prop">Locador</Label>
-                  <Input
-                    id="loc-prop"
-                    value={form.proprietario}
-                    onChange={(e) => set("proprietario", e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="loc-prop-email">E-mail</Label>
-                  <Input
-                    id="loc-prop-email"
-                    type="email"
-                    value={form.proprietario_email}
-                    onChange={(e) => set("proprietario_email", e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="loc-prop-celular">Celular</Label>
-                  <Input
-                    id="loc-prop-celular"
-                    value={form.proprietario_celular}
-                    onChange={(e) => set("proprietario_celular", e.target.value)}
-                    inputMode="tel"
-                  />
-                </div>
-              </section>
-
-              <section className="relative grid gap-4 rounded-xl border bg-background/70 p-3">
-                <div className="absolute right-3 top-3">
-                  <AnexoLocacaoDocumento
-                    label="locatário"
-                    valor={form.locatario_doc_url}
-                    onChange={(path) => setAnexo("locatario_doc_url", path)}
-                  />
-                </div>
-                <h3 className="text-center text-sm font-bold uppercase tracking-wide">Locatário</h3>
-                <div className="space-y-1.5">
-                  <Label>Tipo de pessoa</Label>
-                  <Select
-                    value={form.locatario_tipo_pessoa}
-                    onValueChange={(v) => set("locatario_tipo_pessoa", v)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="fisica">Pessoa física</SelectItem>
-                      <SelectItem value="juridica">Pessoa jurídica</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="loc-locatario">Locatário</Label>
-                  <Input
-                    id="loc-locatario"
-                    value={form.locatario}
-                    onChange={(e) => set("locatario", e.target.value)}
-                  />
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="loc-profissao">Profissão</Label>
-                    <Input
-                      id="loc-profissao"
-                      value={form.locatario_profissao}
-                      onChange={(e) => set("locatario_profissao", e.target.value)}
+                <section className="relative grid gap-4 rounded-xl border bg-background/70 p-3">
+                  <div className="absolute right-3 top-3">
+                    <AnexoLocacaoDocumento
+                      label="locador"
+                      valor={form.proprietario_doc_url}
+                      onChange={(path) => setAnexo("proprietario_doc_url", path)}
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label>Estado civil</Label>
+                    <Label htmlFor="loc-prop">Locador</Label>
+                    <Input
+                      id="loc-prop"
+                      value={form.proprietario}
+                      onChange={(e) => set("proprietario", e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="loc-prop-email">E-mail</Label>
+                    <Input
+                      id="loc-prop-email"
+                      type="email"
+                      value={form.proprietario_email}
+                      onChange={(e) => set("proprietario_email", e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="loc-prop-celular">Celular</Label>
+                    <Input
+                      id="loc-prop-celular"
+                      value={form.proprietario_celular}
+                      onChange={(e) => set("proprietario_celular", e.target.value)}
+                      inputMode="tel"
+                    />
+                  </div>
+                </section>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <h3 className="text-center text-sm font-bold uppercase tracking-wide">Locatário</h3>
+                <section className="relative grid gap-4 rounded-xl border bg-background/70 p-3">
+                  <div className="absolute right-3 top-3">
+                    <AnexoLocacaoDocumento
+                      label="locatário"
+                      valor={form.locatario_doc_url}
+                      onChange={(path) => setAnexo("locatario_doc_url", path)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Tipo de pessoa</Label>
                     <Select
-                      value={form.locatario_estado_civil}
-                      onValueChange={(v) => set("locatario_estado_civil", v)}
+                      value={form.locatario_tipo_pessoa}
+                      onValueChange={(v) => set("locatario_tipo_pessoa", v)}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione" />
+                        <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="casado">Casado</SelectItem>
-                        <SelectItem value="solteiro">Solteiro</SelectItem>
-                        <SelectItem value="divorciado">Divorciado</SelectItem>
+                        <SelectItem value="fisica">Pessoa física</SelectItem>
+                        <SelectItem value="juridica">Pessoa jurídica</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="loc-email">E-mail</Label>
-                  <Input
-                    id="loc-email"
-                    type="email"
-                    value={form.locatario_email}
-                    onChange={(e) => set("locatario_email", e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="loc-celular">Celular</Label>
-                  <Input
-                    id="loc-celular"
-                    value={form.locatario_celular}
-                    onChange={(e) => set("locatario_celular", e.target.value)}
-                    inputMode="tel"
-                  />
-                </div>
-              </section>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="loc-locatario">Locatário</Label>
+                    <Input
+                      id="loc-locatario"
+                      value={form.locatario}
+                      onChange={(e) => set("locatario", e.target.value)}
+                    />
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="loc-profissao">Profissão</Label>
+                      <Input
+                        id="loc-profissao"
+                        value={form.locatario_profissao}
+                        onChange={(e) => set("locatario_profissao", e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Estado civil</Label>
+                      <Select
+                        value={form.locatario_estado_civil}
+                        onValueChange={(v) => set("locatario_estado_civil", v)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="casado">Casado</SelectItem>
+                          <SelectItem value="solteiro">Solteiro</SelectItem>
+                          <SelectItem value="divorciado">Divorciado</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="loc-email">E-mail</Label>
+                    <Input
+                      id="loc-email"
+                      type="email"
+                      value={form.locatario_email}
+                      onChange={(e) => set("locatario_email", e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="loc-celular">Celular</Label>
+                    <Input
+                      id="loc-celular"
+                      value={form.locatario_celular}
+                      onChange={(e) => set("locatario_celular", e.target.value)}
+                      inputMode="tel"
+                    />
+                  </div>
+                </section>
+              </div>
             </div>
           </div>
 
