@@ -73,6 +73,7 @@ export type Database = {
           inicio_contrato: string | null;
           locatario: string;
           locatario_celular: string;
+          locatario_doc_url: string;
           locatario_email: string;
           locatario_estado_civil: string;
           locatario_profissao: string;
@@ -82,6 +83,7 @@ export type Database = {
           prazo: string;
           proprietario: string;
           proprietario_celular: string;
+          proprietario_doc_url: string;
           proprietario_email: string;
           status_vistoria: string;
           tipo_locacao: string;
@@ -105,6 +107,7 @@ export type Database = {
           inicio_contrato?: string | null;
           locatario?: string;
           locatario_celular?: string;
+          locatario_doc_url?: string;
           locatario_email?: string;
           locatario_estado_civil?: string;
           locatario_profissao?: string;
@@ -114,6 +117,7 @@ export type Database = {
           prazo?: string;
           proprietario?: string;
           proprietario_celular?: string;
+          proprietario_doc_url?: string;
           proprietario_email?: string;
           status_vistoria?: string;
           tipo_locacao?: string;
@@ -137,6 +141,7 @@ export type Database = {
           inicio_contrato?: string | null;
           locatario?: string;
           locatario_celular?: string;
+          locatario_doc_url?: string;
           locatario_email?: string;
           locatario_estado_civil?: string;
           locatario_profissao?: string;
@@ -146,6 +151,7 @@ export type Database = {
           prazo?: string;
           proprietario?: string;
           proprietario_celular?: string;
+          proprietario_doc_url?: string;
           proprietario_email?: string;
           status_vistoria?: string;
           tipo_locacao?: string;

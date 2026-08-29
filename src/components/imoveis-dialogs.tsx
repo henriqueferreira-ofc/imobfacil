@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { FileCheck2, Loader2, Paperclip, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -35,17 +36,18 @@ type LocacaoForm = {
   proprietario: string;
   proprietario_email: string;
   proprietario_celular: string;
+  proprietario_doc_url: string;
   locatario: string;
   locatario_profissao: string;
   locatario_estado_civil: string;
   locatario_email: string;
   locatario_celular: string;
+  locatario_doc_url: string;
   descricao_imovel: string;
   tipo_locacao: string;
   prazo: string;
   administracao: string;
   valor_aluguel: string;
-  garantia: string;
   inicio_contrato: string;
   vencimento_dia: string;
   status_vistoria: string;
@@ -63,22 +65,116 @@ const locacaoVazia: LocacaoForm = {
   proprietario: "",
   proprietario_email: "",
   proprietario_celular: "",
+  proprietario_doc_url: "",
   locatario: "",
   locatario_profissao: "",
   locatario_estado_civil: "",
   locatario_email: "",
   locatario_celular: "",
+  locatario_doc_url: "",
   descricao_imovel: "",
   tipo_locacao: "residencial",
   prazo: "",
   administracao: "nao",
   valor_aluguel: "",
-  garantia: "",
   inicio_contrato: "",
   vencimento_dia: "4",
   status_vistoria: "em_analise",
   observacoes: "",
 };
+
+type LocacaoAnexoKey = "proprietario_doc_url" | "locatario_doc_url";
+
+function AnexoLocacaoDocumento({
+  valor,
+  onChange,
+  label,
+}: {
+  valor: string;
+  onChange: (path: string) => void;
+  label: string;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [enviando, setEnviando] = useState(false);
+
+  async function enviar(file: File) {
+    setEnviando(true);
+    const ext = file.name.split(".").pop() ?? "pdf";
+    const path = `locacoes/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from("protocolo-docs").upload(path, file);
+    setEnviando(false);
+    if (error) {
+      toast.error(`Erro ao anexar ${label}`, { description: error.message });
+      return;
+    }
+    onChange(path);
+    toast.success(`${label}: documento anexado`);
+  }
+
+  async function abrir() {
+    const { data, error } = await supabase.storage
+      .from("protocolo-docs")
+      .createSignedUrl(valor, 300);
+    if (error || !data) {
+      toast.error("Não foi possível abrir o documento");
+      return;
+    }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  }
+
+  return (
+    <div className="flex shrink-0 items-center gap-1">
+      <input
+        ref={inputRef}
+        type="file"
+        className="hidden"
+        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) void enviar(file);
+          e.target.value = "";
+        }}
+      />
+      {valor ? (
+        <>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => void abrir()}
+            title="Ver documento anexado"
+          >
+            <FileCheck2 className="size-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onChange("")}
+            title="Remover anexo"
+          >
+            <X className="size-4" />
+          </Button>
+        </>
+      ) : (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={enviando}
+          onClick={() => inputRef.current?.click()}
+          title={`Anexar documento de ${label}`}
+        >
+          {enviando ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Paperclip className="size-4" />
+          )}
+        </Button>
+      )}
+    </div>
+  );
+}
 
 export function LocacaoDialog({
   open,
@@ -107,17 +203,18 @@ export function LocacaoDialog({
             proprietario: registro.proprietario ?? "",
             proprietario_email: registro.proprietario_email ?? "",
             proprietario_celular: registro.proprietario_celular ?? "",
+            proprietario_doc_url: registro.proprietario_doc_url ?? "",
             locatario: registro.locatario ?? "",
             locatario_profissao: registro.locatario_profissao ?? "",
             locatario_estado_civil: registro.locatario_estado_civil ?? "",
             locatario_email: registro.locatario_email ?? "",
             locatario_celular: registro.locatario_celular ?? "",
+            locatario_doc_url: registro.locatario_doc_url ?? "",
             descricao_imovel: registro.descricao_imovel ?? "",
             tipo_locacao: registro.tipo_locacao ?? "residencial",
             prazo: registro.prazo ?? "",
             administracao: registro.administracao ? "sim" : "nao",
             valor_aluguel: String(registro.valor_aluguel ?? ""),
-            garantia: registro.garantia ?? "",
             inicio_contrato: registro.inicio_contrato ?? "",
             vencimento_dia: String(registro.vencimento_dia ?? 4),
             status_vistoria: registro.status_vistoria ?? "em_analise",
@@ -140,17 +237,18 @@ export function LocacaoDialog({
         proprietario: form.proprietario,
         proprietario_email: form.proprietario_email,
         proprietario_celular: form.proprietario_celular,
+        proprietario_doc_url: form.proprietario_doc_url,
         locatario: form.locatario,
         locatario_profissao: form.locatario_profissao,
         locatario_estado_civil: form.locatario_estado_civil,
         locatario_email: form.locatario_email,
         locatario_celular: form.locatario_celular,
+        locatario_doc_url: form.locatario_doc_url,
         descricao_imovel: form.descricao_imovel,
         tipo_locacao: form.tipo_locacao,
         prazo: form.prazo,
         administracao: form.administracao === "sim",
         valor_aluguel: Number(form.valor_aluguel.replace(",", ".")) || 0,
-        garantia: form.garantia,
         inicio_contrato: form.inicio_contrato || null,
         vencimento_dia: Number(form.vencimento_dia) || 4,
         status_vistoria: form.status_vistoria,
@@ -176,6 +274,10 @@ export function LocacaoDialog({
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
+  function setAnexo(key: LocacaoAnexoKey, path: string) {
+    setForm((prev) => ({ ...prev, [key]: path }));
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90dvh] w-[calc(100vw-2rem)] overflow-y-auto sm:max-w-2xl">
@@ -195,98 +297,125 @@ export function LocacaoDialog({
             salvar.mutate();
           }}
         >
-          <div className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:col-span-2 sm:grid-cols-2">
-            <p className="text-muted-foreground text-xs font-semibold uppercase tracking-[0.18em] sm:col-span-2">
-              Dados do locatário(a)
+          <div className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:col-span-2">
+            <p className="text-muted-foreground text-xs font-semibold uppercase tracking-[0.18em]">
+              Locador e Locatário
             </p>
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label>Tipo de pessoa</Label>
-              <Select
-                value={form.locatario_tipo_pessoa}
-                onValueChange={(v) => set("locatario_tipo_pessoa", v)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="fisica">Pessoa física</SelectItem>
-                  <SelectItem value="juridica">Pessoa jurídica</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="loc-locatario">Nome</Label>
-              <Input
-                id="loc-locatario"
-                value={form.locatario}
-                onChange={(e) => set("locatario", e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="loc-profissao">Profissão</Label>
-              <Input
-                id="loc-profissao"
-                value={form.locatario_profissao}
-                onChange={(e) => set("locatario_profissao", e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="loc-estado-civil">Estado civil</Label>
-              <Input
-                id="loc-estado-civil"
-                value={form.locatario_estado_civil}
-                onChange={(e) => set("locatario_estado_civil", e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="loc-email">E-mail</Label>
-              <Input
-                id="loc-email"
-                type="email"
-                value={form.locatario_email}
-                onChange={(e) => set("locatario_email", e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="loc-celular">Celular</Label>
-              <Input
-                id="loc-celular"
-                value={form.locatario_celular}
-                onChange={(e) => set("locatario_celular", e.target.value)}
-                inputMode="tel"
-              />
-            </div>
-          </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <section className="grid gap-4 rounded-xl border bg-background/70 p-3">
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="font-display text-sm font-bold">Locador</h3>
+                  <AnexoLocacaoDocumento
+                    label="locador"
+                    valor={form.proprietario_doc_url}
+                    onChange={(path) => setAnexo("proprietario_doc_url", path)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="loc-prop">Locador</Label>
+                  <Input
+                    id="loc-prop"
+                    value={form.proprietario}
+                    onChange={(e) => set("proprietario", e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="loc-prop-email">E-mail</Label>
+                  <Input
+                    id="loc-prop-email"
+                    type="email"
+                    value={form.proprietario_email}
+                    onChange={(e) => set("proprietario_email", e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="loc-prop-celular">Celular</Label>
+                  <Input
+                    id="loc-prop-celular"
+                    value={form.proprietario_celular}
+                    onChange={(e) => set("proprietario_celular", e.target.value)}
+                    inputMode="tel"
+                  />
+                </div>
+              </section>
 
-          <div className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:col-span-2 sm:grid-cols-2">
-            <p className="text-muted-foreground text-xs font-semibold uppercase tracking-[0.18em] sm:col-span-2">
-              Dados do locador(a)
-            </p>
-            <div className="space-y-1.5">
-              <Label htmlFor="loc-prop">Nome do locador</Label>
-              <Input
-                id="loc-prop"
-                value={form.proprietario}
-                onChange={(e) => set("proprietario", e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="loc-prop-email">E-mail do locador</Label>
-              <Input
-                id="loc-prop-email"
-                type="email"
-                value={form.proprietario_email}
-                onChange={(e) => set("proprietario_email", e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="loc-prop-celular">Celular do locador</Label>
-              <Input
-                id="loc-prop-celular"
-                value={form.proprietario_celular}
-                onChange={(e) => set("proprietario_celular", e.target.value)}
-                inputMode="tel"
-              />
+              <section className="grid gap-4 rounded-xl border bg-background/70 p-3">
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="font-display text-sm font-bold">Locatário</h3>
+                  <AnexoLocacaoDocumento
+                    label="locatário"
+                    valor={form.locatario_doc_url}
+                    onChange={(path) => setAnexo("locatario_doc_url", path)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Tipo de pessoa</Label>
+                  <Select
+                    value={form.locatario_tipo_pessoa}
+                    onValueChange={(v) => set("locatario_tipo_pessoa", v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="fisica">Pessoa física</SelectItem>
+                      <SelectItem value="juridica">Pessoa jurídica</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="loc-locatario">Locatário</Label>
+                  <Input
+                    id="loc-locatario"
+                    value={form.locatario}
+                    onChange={(e) => set("locatario", e.target.value)}
+                  />
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="loc-profissao">Profissão</Label>
+                    <Input
+                      id="loc-profissao"
+                      value={form.locatario_profissao}
+                      onChange={(e) => set("locatario_profissao", e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Estado civil</Label>
+                    <Select
+                      value={form.locatario_estado_civil}
+                      onValueChange={(v) => set("locatario_estado_civil", v)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="casado">Casado</SelectItem>
+                        <SelectItem value="solteiro">Solteiro</SelectItem>
+                        <SelectItem value="divorciado">Divorciado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="loc-email">E-mail</Label>
+                  <Input
+                    id="loc-email"
+                    type="email"
+                    value={form.locatario_email}
+                    onChange={(e) => set("locatario_email", e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="loc-celular">Celular</Label>
+                  <Input
+                    id="loc-celular"
+                    value={form.locatario_celular}
+                    onChange={(e) => set("locatario_celular", e.target.value)}
+                    inputMode="tel"
+                  />
+                </div>
+              </section>
             </div>
           </div>
 
@@ -431,15 +560,6 @@ export function LocacaoDialog({
                   <SelectItem value="nao">Não</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="loc-garantia">Garantia</Label>
-              <Input
-                id="loc-garantia"
-                value={form.garantia}
-                onChange={(e) => set("garantia", e.target.value)}
-                placeholder="Fiador, caução, seguro-fiança"
-              />
             </div>
           </div>
 

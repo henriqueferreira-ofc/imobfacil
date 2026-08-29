@@ -188,7 +188,6 @@ export function LocacaoModule() {
         l.locatario,
         l.locatario_email,
         l.locatario_celular,
-        l.garantia,
         l.tipo_locacao,
         l.prazo,
       ]
@@ -204,7 +203,7 @@ export function LocacaoModule() {
   return (
     <ModuleShell
       title="Locação de Imóveis"
-      description="Controle contratos, ocupação, garantias, vencimentos e vistoria de imóveis alugados."
+      description="Controle contratos, ocupação, vencimentos e vistoria de imóveis alugados."
       stats={[
         { label: "Contratos", valor: lista.length },
         {
@@ -264,7 +263,6 @@ export function LocacaoModule() {
                 />
                 <Campo label="Vencimento" valor={`Dia ${l.vencimento_dia}`} />
                 <Campo label="Administração" valor={l.administracao ? "Sim" : "Não"} />
-                <Campo label="Garantia" valor={l.garantia} />
                 <Campo label="Locador celular" valor={l.proprietario_celular} />
                 <Campo label="Locatário celular" valor={l.locatario_celular} />
                 <Campo label="Atualizado" valor={formatarData(l.updated_at)} />
