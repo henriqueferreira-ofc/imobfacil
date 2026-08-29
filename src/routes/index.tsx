@@ -136,7 +136,10 @@ function Home() {
               administração revisa e gerencia tudo no painel.
             </p>
 
-            <form onSubmit={consultarLocacao} className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row">
+            <form
+              onSubmit={consultarLocacao}
+              className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row"
+            >
               <Input
                 value={codigoLocacao}
                 onChange={(e) => setCodigoLocacao(e.target.value)}
@@ -177,42 +180,6 @@ function Home() {
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{texto}</p>
             </div>
           ))}
-        </section>
-
-        <section className="shadow-soft mt-6 grid gap-5 rounded-3xl border bg-card p-5 sm:mt-8 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-          <div className="min-w-0">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
-              <Building2 className="size-5" />
-            </span>
-            <h2 className="mt-4 text-lg font-semibold">Locação de Imóveis</h2>
-            <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-              Cadastre uma nova locação pela consulta pública ou acompanhe pelo código gerado após o
-              envio. A administração revisa e gerencia tudo no painel.
-            </p>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] lg:w-[34rem]">
-            <form
-              onSubmit={consultarLocacao}
-              className="grid min-w-0 gap-3 sm:grid-cols-[1fr_auto]"
-            >
-              <Input
-                value={codigoLocacao}
-                onChange={(e) => setCodigoLocacao(e.target.value)}
-                placeholder="Ex.: LOC-2026-1001"
-                aria-label="Código da locação"
-                className="h-12 text-base"
-              />
-              <Button type="submit" variant="outline" className="h-12">
-                Consultar
-                <ArrowRight className="size-4" />
-              </Button>
-            </form>
-            <Button className="h-12" onClick={() => setLocacaoAberta(true)}>
-              <Plus className="size-4" />
-              Nova locação
-            </Button>
-          </div>
         </section>
       </main>
 
