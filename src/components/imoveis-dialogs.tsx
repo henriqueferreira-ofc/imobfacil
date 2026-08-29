@@ -302,15 +302,15 @@ export function LocacaoDialog({
               Locador e Locatário
             </p>
             <div className="grid gap-4 md:grid-cols-2">
-              <section className="grid gap-4 rounded-xl border bg-background/70 p-3">
-                <div className="flex items-center justify-between gap-3">
-                  <h3 className="font-display text-sm font-bold">Locador</h3>
+              <section className="relative grid gap-4 rounded-xl border bg-background/70 p-3">
+                <div className="absolute right-3 top-3">
                   <AnexoLocacaoDocumento
                     label="locador"
                     valor={form.proprietario_doc_url}
                     onChange={(path) => setAnexo("proprietario_doc_url", path)}
                   />
                 </div>
+                <h3 className="text-center text-sm font-bold uppercase tracking-wide">Locador</h3>
                 <div className="space-y-1.5">
                   <Label htmlFor="loc-prop">Locador</Label>
                   <Input
@@ -339,15 +339,15 @@ export function LocacaoDialog({
                 </div>
               </section>
 
-              <section className="grid gap-4 rounded-xl border bg-background/70 p-3">
-                <div className="flex items-center justify-between gap-3">
-                  <h3 className="font-display text-sm font-bold">Locatário</h3>
+              <section className="relative grid gap-4 rounded-xl border bg-background/70 p-3">
+                <div className="absolute right-3 top-3">
                   <AnexoLocacaoDocumento
                     label="locatário"
                     valor={form.locatario_doc_url}
                     onChange={(path) => setAnexo("locatario_doc_url", path)}
                   />
                 </div>
+                <h3 className="text-center text-sm font-bold uppercase tracking-wide">Locatário</h3>
                 <div className="space-y-1.5">
                   <Label>Tipo de pessoa</Label>
                   <Select
