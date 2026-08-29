@@ -1,0 +1,1 @@
+ALTER TABLE public.locacoes ADD COLUMN IF NOT EXISTS administracao boolean NOT NULL DEFAULT false;
