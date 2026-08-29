@@ -119,6 +119,54 @@ function Home() {
           </div>
         </section>
 
+        <section className="bg-brand-gradient shadow-panel relative mt-6 overflow-hidden rounded-3xl px-5 py-10 text-primary-foreground sm:mt-8 sm:px-10 sm:py-14 lg:px-12 lg:py-16">
+          <div
+            aria-hidden
+            className="absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-brand-bright/25 blur-3xl"
+          />
+          <div className="relative max-w-2xl">
+            <span className="flex size-10 items-center justify-center rounded-xl bg-card/15 text-primary-foreground">
+              <Building2 className="size-5" />
+            </span>
+            <h2 className="mt-4 text-[1.5rem] leading-[1.15] font-bold sm:text-3xl lg:text-4xl">
+              Locação de Imóveis
+            </h2>
+            <p className="mt-3 max-w-xl text-sm text-primary-foreground/80 sm:text-base">
+              Cadastre uma nova locação ou acompanhe pelo código gerado após o envio. A
+              administração revisa e gerencia tudo no painel.
+            </p>
+
+            <form onSubmit={consultarLocacao} className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row">
+              <Input
+                value={codigoLocacao}
+                onChange={(e) => setCodigoLocacao(e.target.value)}
+                placeholder="Ex.: LOC-2026-1001"
+                aria-label="Código da locação"
+                className="h-12 w-full border-transparent bg-card text-base text-foreground placeholder:text-muted-foreground sm:max-w-xs"
+              />
+              <Button
+                type="submit"
+                size="lg"
+                variant="secondary"
+                className="h-12 w-full font-semibold sm:w-auto"
+              >
+                Consultar locação
+                <ArrowRight className="size-4" />
+              </Button>
+              <Button
+                type="button"
+                size="lg"
+                variant="outline"
+                className="h-12 w-full border-primary-foreground/30 bg-transparent font-semibold text-primary-foreground hover:bg-card/10 hover:text-primary-foreground sm:w-auto"
+                onClick={() => setLocacaoAberta(true)}
+              >
+                <Plus className="size-4" />
+                Nova locação
+              </Button>
+            </form>
+          </div>
+        </section>
+
         <section className="mt-6 grid gap-4 sm:mt-8 sm:grid-cols-2 lg:grid-cols-3">
           {passos.map(({ icon: Icon, titulo, texto }) => (
             <div key={titulo} className="shadow-soft rounded-2xl border bg-card p-5 sm:p-6">
