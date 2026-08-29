@@ -49,6 +49,7 @@ function Home() {
   const [numero, setNumero] = useState("");
   const [codigoLocacao, setCodigoLocacao] = useState("");
   const [locacaoAberta, setLocacaoAberta] = useState(false);
+  const [locacaoCriada, setLocacaoCriada] = useState("");
 
   function consultar(e: React.FormEvent) {
     e.preventDefault();
@@ -167,6 +168,32 @@ function Home() {
                 Nova locação
               </Button>
             </form>
+
+            {locacaoCriada ? (
+              <div className="mt-5 rounded-2xl border border-primary-foreground/20 bg-card/10 p-4">
+                <p className="text-sm font-semibold">Locação cadastrada com sucesso.</p>
+                <p className="mt-1 text-sm text-primary-foreground/80">
+                  Guarde este número para consultar depois:
+                </p>
+                <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <code className="rounded-xl bg-card px-4 py-3 text-center text-lg font-bold tracking-wide text-foreground">
+                    {locacaoCriada}
+                  </code>
+                  <Button
+                    type="button"
+                    size="lg"
+                    variant="secondary"
+                    className="h-12 font-semibold"
+                    onClick={() =>
+                      navigate({ to: "/l/$codigo", params: { codigo: locacaoCriada } })
+                    }
+                  >
+                    Consultar agora
+                    <ArrowRight className="size-4" />
+                  </Button>
+                </div>
+              </div>
+            ) : null}
           </div>
         </section>
 
@@ -189,7 +216,8 @@ function Home() {
         registro={null}
         publico
         onPublicSuccess={(codigo) => {
-          navigate({ to: "/l/$codigo", params: { codigo } });
+          setLocacaoCriada(codigo);
+          setCodigoLocacao(codigo);
         }}
       />
 
