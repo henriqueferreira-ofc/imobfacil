@@ -64,6 +64,7 @@ export type Database = {
       }
       locacoes: {
         Row: {
+          administracao: boolean
           bairro: string
           cep: string
           cidade: string
@@ -85,6 +86,7 @@ export type Database = {
           vencimento_dia: number
         }
         Insert: {
+          administracao?: boolean
           bairro?: string
           cep?: string
           cidade?: string
@@ -106,6 +108,7 @@ export type Database = {
           vencimento_dia?: number
         }
         Update: {
+          administracao?: boolean
           bairro?: string
           cep?: string
           cidade?: string
