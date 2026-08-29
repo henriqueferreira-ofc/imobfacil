@@ -8,6 +8,7 @@ export const STATUS_VISTORIA_LABEL: Record<string, string> = {
 
 export interface Locacao {
   id: string;
+  codigo: string;
   imovel: string;
   endereco: string;
   numero_casa: string;
@@ -38,6 +39,8 @@ export interface Locacao {
   created_at: string;
   updated_at: string;
 }
+
+export type LocacaoPublica = Omit<Locacao, "id" | "created_by">;
 
 export interface ImovelAdministrado {
   id: string;

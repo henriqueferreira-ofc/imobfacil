@@ -182,6 +182,7 @@ export function LocacaoModule() {
         l.cep,
         l.cidade,
         l.estado,
+        l.codigo,
         l.proprietario,
         l.proprietario_email,
         l.proprietario_celular,
@@ -240,7 +241,7 @@ export function LocacaoModule() {
           filtrados.map((l) => (
             <article key={l.id} className="shadow-soft rounded-2xl border bg-card p-4 sm:p-5">
               <CardHeaderRow
-                titulo={enderecoCompleto(l) || "Imóvel não informado"}
+                titulo={l.codigo || enderecoCompleto(l) || "Imóvel não informado"}
                 status={l.status_vistoria}
                 onEditar={() => {
                   setEmEdicao(l);
@@ -248,6 +249,9 @@ export function LocacaoModule() {
                 }}
                 onExcluir={() => setParaExcluir(l)}
               />
+              {enderecoCompleto(l) ? (
+                <p className="mt-2 text-sm text-muted-foreground">{enderecoCompleto(l)}</p>
+              ) : null}
               <dl className="mt-4 grid grid-cols-2 gap-4 text-sm lg:grid-cols-4">
                 <Campo label="Proprietário" valor={l.proprietario} />
                 <Campo label="Locatário" valor={l.locatario} />

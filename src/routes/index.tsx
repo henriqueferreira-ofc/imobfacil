@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowRight, FileText, Lock, Search, ShieldCheck } from "lucide-react";
+import { ArrowRight, Building2, FileText, Lock, Plus, Search, ShieldCheck } from "lucide-react";
 import { Wordmark } from "@/components/brand";
+import { LocacaoDialog } from "@/components/imoveis-dialogs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { normalizarNumero } from "@/lib/protocolos";
@@ -46,12 +47,21 @@ const passos = [
 function Home() {
   const navigate = useNavigate();
   const [numero, setNumero] = useState("");
+  const [codigoLocacao, setCodigoLocacao] = useState("");
+  const [locacaoAberta, setLocacaoAberta] = useState(false);
 
   function consultar(e: React.FormEvent) {
     e.preventDefault();
     const valor = normalizarNumero(numero);
     if (!valor) return;
     navigate({ to: "/p/$numero", params: { numero: valor } });
+  }
+
+  function consultarLocacao(e: React.FormEvent) {
+    e.preventDefault();
+    const valor = normalizarNumero(codigoLocacao);
+    if (!valor) return;
+    navigate({ to: "/l/$codigo", params: { codigo: valor } });
   }
 
   return (
@@ -120,7 +130,53 @@ function Home() {
             </div>
           ))}
         </section>
+
+        <section className="shadow-soft mt-6 grid gap-5 rounded-3xl border bg-card p-5 sm:mt-8 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          <div className="min-w-0">
+            <span className="flex size-10 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
+              <Building2 className="size-5" />
+            </span>
+            <h2 className="mt-4 text-lg font-semibold">Locação de Imóveis</h2>
+            <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+              Cadastre uma nova locação pela consulta pública ou acompanhe pelo código gerado após o
+              envio. A administração revisa e gerencia tudo no painel.
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] lg:w-[34rem]">
+            <form
+              onSubmit={consultarLocacao}
+              className="grid min-w-0 gap-3 sm:grid-cols-[1fr_auto]"
+            >
+              <Input
+                value={codigoLocacao}
+                onChange={(e) => setCodigoLocacao(e.target.value)}
+                placeholder="Ex.: LOC-2026-1001"
+                aria-label="Código da locação"
+                className="h-12 text-base"
+              />
+              <Button type="submit" variant="outline" className="h-12">
+                Consultar
+                <ArrowRight className="size-4" />
+              </Button>
+            </form>
+            <Button className="h-12" onClick={() => setLocacaoAberta(true)}>
+              <Plus className="size-4" />
+              Nova locação
+            </Button>
+          </div>
+        </section>
       </main>
+
+      <LocacaoDialog
+        open={locacaoAberta}
+        onOpenChange={setLocacaoAberta}
+        registro={null}
+        publico
+        onPublicSuccess={(codigo) => {
+          navigate({ to: "/l/$codigo", params: { codigo } });
+        }}
+      />
 
       <footer className="border-t py-8">
         <div className="mx-auto flex max-w-6xl justify-center px-4 text-center text-xs text-muted-foreground sm:px-6 lg:justify-end lg:text-right">

@@ -180,10 +180,14 @@ export function LocacaoDialog({
   open,
   onOpenChange,
   registro,
+  publico = false,
+  onPublicSuccess,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   registro: Locacao | null;
+  publico?: boolean;
+  onPublicSuccess?: (codigo: string) => void;
 }) {
   const queryClient = useQueryClient();
   const [form, setForm] = useState<LocacaoForm>(locacaoVazia);
@@ -254,6 +258,13 @@ export function LocacaoDialog({
         status_vistoria: form.status_vistoria,
         observacoes: form.observacoes,
       };
+      if (publico) {
+        const { data, error } = await supabase.rpc("cadastrar_locacao_publica", {
+          p_payload: payload,
+        });
+        if (error) throw error;
+        return data as string;
+      }
       if (registro) {
         const { error } = await supabase.from("locacoes").update(payload).eq("id", registro.id);
         if (error) throw error;
@@ -262,8 +273,14 @@ export function LocacaoDialog({
       const { error } = await supabase.from("locacoes").insert(payload);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (codigo) => {
       queryClient.invalidateQueries({ queryKey: ["locacoes"] });
+      if (publico && codigo) {
+        toast.success(`Locação cadastrada: ${codigo}`);
+        onPublicSuccess?.(codigo);
+        onOpenChange(false);
+        return;
+      }
       toast.success(registro ? "Locação atualizada" : "Locação cadastrada");
       onOpenChange(false);
     },
@@ -286,7 +303,9 @@ export function LocacaoDialog({
             {registro ? "Editar locação" : "Nova locação"}
           </DialogTitle>
           <DialogDescription>
-            Contrato, partes envolvidas, aluguel e status da vistoria.
+            {publico
+              ? "Preencha os dados da locação. O administrador acompanhará o cadastro pelo painel."
+              : "Contrato, partes envolvidas, aluguel e status da vistoria."}
           </DialogDescription>
         </DialogHeader>
 

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as LCodigoRouteImport } from './routes/l.$codigo'
 import { Route as PNumeroRouteImport } from './routes/p.$numero'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LCodigoRoute = LCodigoRouteImport.update({
+  id: '/l/$codigo',
+  path: '/l/$codigo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PNumeroRoute = PNumeroRouteImport.update({
   id: '/p/$numero',
   path: '/p/$numero',
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/l/$codigo': typeof LCodigoRoute
   '/p/$numero': typeof PNumeroRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/l/$codigo': typeof LCodigoRoute
   '/p/$numero': typeof PNumeroRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/l/$codigo': typeof LCodigoRoute
   '/p/$numero': typeof PNumeroRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/auth' | '/p/$numero'
+  fullPaths: '/' | '/admin' | '/auth' | '/l/$codigo' | '/p/$numero'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/auth' | '/p/$numero'
-  id: '__root__' | '/' | '/admin' | '/auth' | '/p/$numero'
+  to: '/' | '/admin' | '/auth' | '/l/$codigo' | '/p/$numero'
+  id: '__root__' | '/' | '/admin' | '/auth' | '/l/$codigo' | '/p/$numero'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
+  LCodigoRoute: typeof LCodigoRoute
   PNumeroRoute: typeof PNumeroRoute
 }
 
@@ -92,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/l/$codigo': {
+      id: '/l/$codigo'
+      path: '/l/$codigo'
+      fullPath: '/l/$codigo'
+      preLoaderRoute: typeof LCodigoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/p/$numero': {
       id: '/p/$numero'
       path: '/p/$numero'
@@ -106,6 +123,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
+  LCodigoRoute: LCodigoRoute,
   PNumeroRoute: PNumeroRoute,
 }
 export const routeTree = rootRouteImport
