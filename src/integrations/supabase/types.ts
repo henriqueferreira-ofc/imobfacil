@@ -70,6 +70,7 @@ export type Database = {
           cidade: string
           created_at: string
           created_by: string | null
+          descricao_imovel: string
           endereco: string
           estado: string
           garantia: string
@@ -77,10 +78,21 @@ export type Database = {
           imovel: string
           inicio_contrato: string | null
           locatario: string
+          locatario_celular: string
+          locatario_doc_url: string
+          locatario_email: string
+          locatario_estado_civil: string
+          locatario_profissao: string
+          locatario_tipo_pessoa: string
           numero_casa: string
           observacoes: string
+          prazo: string
           proprietario: string
+          proprietario_celular: string
+          proprietario_doc_url: string
+          proprietario_email: string
           status_vistoria: string
+          tipo_locacao: string
           updated_at: string
           valor_aluguel: number
           vencimento_dia: number
@@ -92,6 +104,7 @@ export type Database = {
           cidade?: string
           created_at?: string
           created_by?: string | null
+          descricao_imovel?: string
           endereco?: string
           estado?: string
           garantia?: string
@@ -99,10 +112,21 @@ export type Database = {
           imovel?: string
           inicio_contrato?: string | null
           locatario?: string
+          locatario_celular?: string
+          locatario_doc_url?: string
+          locatario_email?: string
+          locatario_estado_civil?: string
+          locatario_profissao?: string
+          locatario_tipo_pessoa?: string
           numero_casa?: string
           observacoes?: string
+          prazo?: string
           proprietario?: string
+          proprietario_celular?: string
+          proprietario_doc_url?: string
+          proprietario_email?: string
           status_vistoria?: string
+          tipo_locacao?: string
           updated_at?: string
           valor_aluguel?: number
           vencimento_dia?: number
@@ -114,6 +138,7 @@ export type Database = {
           cidade?: string
           created_at?: string
           created_by?: string | null
+          descricao_imovel?: string
           endereco?: string
           estado?: string
           garantia?: string
@@ -121,10 +146,21 @@ export type Database = {
           imovel?: string
           inicio_contrato?: string | null
           locatario?: string
+          locatario_celular?: string
+          locatario_doc_url?: string
+          locatario_email?: string
+          locatario_estado_civil?: string
+          locatario_profissao?: string
+          locatario_tipo_pessoa?: string
           numero_casa?: string
           observacoes?: string
+          prazo?: string
           proprietario?: string
+          proprietario_celular?: string
+          proprietario_doc_url?: string
+          proprietario_email?: string
           status_vistoria?: string
+          tipo_locacao?: string
           updated_at?: string
           valor_aluguel?: number
           vencimento_dia?: number
