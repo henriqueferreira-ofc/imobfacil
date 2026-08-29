@@ -303,11 +303,13 @@ export function LocacaoDialog({
             </p>
             <div className="grid gap-4 md:grid-cols-2">
               <section className="relative grid gap-4 rounded-xl border bg-background/70 p-3">
-                <AnexoLocacaoDocumento
-                  label="locador"
-                  valor={form.proprietario_doc_url}
-                  onChange={(path) => setAnexo("proprietario_doc_url", path)}
-                />
+                <div className="absolute right-3 top-3">
+                  <AnexoLocacaoDocumento
+                    label="locador"
+                    valor={form.proprietario_doc_url}
+                    onChange={(path) => setAnexo("proprietario_doc_url", path)}
+                  />
+                </div>
                 <h3 className="text-center text-sm font-bold uppercase tracking-wide">Locador</h3>
                 <div className="space-y-1.5">
                   <Label htmlFor="loc-prop">Locador</Label>
