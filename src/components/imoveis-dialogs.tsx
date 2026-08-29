@@ -272,6 +272,7 @@ export function LocacaoDialog({
       }
       const { error } = await supabase.from("locacoes").insert(payload);
       if (error) throw error;
+      return undefined;
     },
     onSuccess: (codigo) => {
       queryClient.invalidateQueries({ queryKey: ["locacoes"] });

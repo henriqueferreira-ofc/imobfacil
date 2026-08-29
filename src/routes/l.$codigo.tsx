@@ -43,7 +43,7 @@ function ConsultaLocacao() {
     queryFn: async () => {
       const { data, error } = await supabase.rpc("consultar_locacao", { p_codigo: codigo });
       if (error) throw error;
-      return ((data as LocacaoPublica[] | null) ?? [])[0] ?? null;
+      return ((data as unknown as LocacaoPublica[] | null) ?? [])[0] ?? null;
     },
   });
 
