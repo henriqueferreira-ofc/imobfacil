@@ -298,13 +298,10 @@ export function LocacaoDialog({
           }}
         >
           <div className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:col-span-2">
-            <p className="text-muted-foreground text-xs font-semibold uppercase tracking-[0.18em]">
-              Locador e Locatário
-            </p>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="flex flex-col gap-2">
+            <div className="grid items-stretch gap-4 md:grid-cols-2">
+              <div className="flex h-full flex-col gap-2">
                 <h3 className="text-center text-sm font-bold uppercase tracking-wide">Locador</h3>
-                <section className="relative grid gap-4 rounded-xl border bg-background/70 p-3">
+                <section className="relative grid h-full content-start gap-4 rounded-xl border bg-background/70 p-3">
                   <div className="absolute right-3 top-3">
                     <AnexoLocacaoDocumento
                       label="locador"
@@ -341,9 +338,9 @@ export function LocacaoDialog({
                 </section>
               </div>
 
-              <div className="flex flex-col gap-2">
+              <div className="flex h-full flex-col gap-2">
                 <h3 className="text-center text-sm font-bold uppercase tracking-wide">Locatário</h3>
-                <section className="relative grid gap-4 rounded-xl border bg-background/70 p-3">
+                <section className="relative grid h-full content-start gap-4 rounded-xl border bg-background/70 p-3">
                   <div className="absolute right-3 top-3">
                     <AnexoLocacaoDocumento
                       label="locatário"
