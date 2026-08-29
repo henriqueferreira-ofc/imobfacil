@@ -68,6 +68,7 @@ export type Database = {
           bairro: string
           cep: string
           cidade: string
+          codigo: string
           created_at: string
           created_by: string | null
           descricao_imovel: string
@@ -102,6 +103,7 @@ export type Database = {
           bairro?: string
           cep?: string
           cidade?: string
+          codigo?: string
           created_at?: string
           created_by?: string | null
           descricao_imovel?: string
@@ -136,6 +138,7 @@ export type Database = {
           bairro?: string
           cep?: string
           cidade?: string
+          codigo?: string
           created_at?: string
           created_by?: string | null
           descricao_imovel?: string
@@ -301,6 +304,41 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cadastrar_locacao_publica: { Args: { p_payload: Json }; Returns: string }
+      consultar_locacao: {
+        Args: { p_codigo: string }
+        Returns: {
+          administracao: boolean
+          bairro: string
+          cep: string
+          cidade: string
+          codigo: string
+          created_at: string
+          descricao_imovel: string
+          endereco: string
+          estado: string
+          garantia: string
+          imovel: string
+          inicio_contrato: string
+          locatario: string
+          locatario_celular: string
+          locatario_email: string
+          locatario_estado_civil: string
+          locatario_profissao: string
+          locatario_tipo_pessoa: string
+          numero_casa: string
+          observacoes: string
+          prazo: string
+          proprietario: string
+          proprietario_celular: string
+          proprietario_email: string
+          status_vistoria: string
+          tipo_locacao: string
+          updated_at: string
+          valor_aluguel: number
+          vencimento_dia: number
+        }[]
+      }
       consultar_protocolo: {
         Args: { p_numero: string }
         Returns: {
