@@ -22,11 +22,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { ESTADOS_UF, formatarCep } from "@/lib/protocolos";
-import {
-  STATUS_VISTORIA_LABEL,
-  type ImovelAdministrado,
-  type Locacao,
-} from "@/lib/imoveis";
+import { STATUS_VISTORIA_LABEL, type ImovelAdministrado, type Locacao } from "@/lib/imoveis";
 
 type LocacaoForm = {
   endereco: string;
@@ -35,8 +31,19 @@ type LocacaoForm = {
   cep: string;
   cidade: string;
   estado: string;
+  locatario_tipo_pessoa: string;
   proprietario: string;
+  proprietario_email: string;
+  proprietario_celular: string;
   locatario: string;
+  locatario_profissao: string;
+  locatario_estado_civil: string;
+  locatario_email: string;
+  locatario_celular: string;
+  descricao_imovel: string;
+  tipo_locacao: string;
+  prazo: string;
+  administracao: string;
   valor_aluguel: string;
   garantia: string;
   inicio_contrato: string;
@@ -52,12 +59,23 @@ const locacaoVazia: LocacaoForm = {
   cep: "",
   cidade: "",
   estado: "",
+  locatario_tipo_pessoa: "fisica",
   proprietario: "",
+  proprietario_email: "",
+  proprietario_celular: "",
   locatario: "",
+  locatario_profissao: "",
+  locatario_estado_civil: "",
+  locatario_email: "",
+  locatario_celular: "",
+  descricao_imovel: "",
+  tipo_locacao: "residencial",
+  prazo: "",
+  administracao: "nao",
   valor_aluguel: "",
   garantia: "",
   inicio_contrato: "",
-  vencimento_dia: "5",
+  vencimento_dia: "4",
   status_vistoria: "em_analise",
   observacoes: "",
 };
@@ -85,12 +103,23 @@ export function LocacaoDialog({
             cep: registro.cep ?? "",
             cidade: registro.cidade ?? "",
             estado: registro.estado ?? "",
+            locatario_tipo_pessoa: registro.locatario_tipo_pessoa ?? "fisica",
             proprietario: registro.proprietario ?? "",
+            proprietario_email: registro.proprietario_email ?? "",
+            proprietario_celular: registro.proprietario_celular ?? "",
             locatario: registro.locatario ?? "",
+            locatario_profissao: registro.locatario_profissao ?? "",
+            locatario_estado_civil: registro.locatario_estado_civil ?? "",
+            locatario_email: registro.locatario_email ?? "",
+            locatario_celular: registro.locatario_celular ?? "",
+            descricao_imovel: registro.descricao_imovel ?? "",
+            tipo_locacao: registro.tipo_locacao ?? "residencial",
+            prazo: registro.prazo ?? "",
+            administracao: registro.administracao ? "sim" : "nao",
             valor_aluguel: String(registro.valor_aluguel ?? ""),
             garantia: registro.garantia ?? "",
             inicio_contrato: registro.inicio_contrato ?? "",
-            vencimento_dia: String(registro.vencimento_dia ?? 5),
+            vencimento_dia: String(registro.vencimento_dia ?? 4),
             status_vistoria: registro.status_vistoria ?? "em_analise",
             observacoes: registro.observacoes ?? "",
           }
@@ -107,12 +136,23 @@ export function LocacaoDialog({
         cep: form.cep,
         cidade: form.cidade,
         estado: form.estado,
+        locatario_tipo_pessoa: form.locatario_tipo_pessoa,
         proprietario: form.proprietario,
+        proprietario_email: form.proprietario_email,
+        proprietario_celular: form.proprietario_celular,
         locatario: form.locatario,
+        locatario_profissao: form.locatario_profissao,
+        locatario_estado_civil: form.locatario_estado_civil,
+        locatario_email: form.locatario_email,
+        locatario_celular: form.locatario_celular,
+        descricao_imovel: form.descricao_imovel,
+        tipo_locacao: form.tipo_locacao,
+        prazo: form.prazo,
+        administracao: form.administracao === "sim",
         valor_aluguel: Number(form.valor_aluguel.replace(",", ".")) || 0,
         garantia: form.garantia,
         inicio_contrato: form.inicio_contrato || null,
-        vencimento_dia: Number(form.vencimento_dia) || 5,
+        vencimento_dia: Number(form.vencimento_dia) || 4,
         status_vistoria: form.status_vistoria,
         observacoes: form.observacoes,
       };
@@ -157,10 +197,105 @@ export function LocacaoDialog({
         >
           <div className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:col-span-2 sm:grid-cols-2">
             <p className="text-muted-foreground text-xs font-semibold uppercase tracking-[0.18em] sm:col-span-2">
-              Imóvel para locação
+              Dados do locatário(a)
+            </p>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label>Tipo de pessoa</Label>
+              <Select
+                value={form.locatario_tipo_pessoa}
+                onValueChange={(v) => set("locatario_tipo_pessoa", v)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="fisica">Pessoa física</SelectItem>
+                  <SelectItem value="juridica">Pessoa jurídica</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="loc-locatario">Nome</Label>
+              <Input
+                id="loc-locatario"
+                value={form.locatario}
+                onChange={(e) => set("locatario", e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="loc-profissao">Profissão</Label>
+              <Input
+                id="loc-profissao"
+                value={form.locatario_profissao}
+                onChange={(e) => set("locatario_profissao", e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="loc-estado-civil">Estado civil</Label>
+              <Input
+                id="loc-estado-civil"
+                value={form.locatario_estado_civil}
+                onChange={(e) => set("locatario_estado_civil", e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="loc-email">E-mail</Label>
+              <Input
+                id="loc-email"
+                type="email"
+                value={form.locatario_email}
+                onChange={(e) => set("locatario_email", e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="loc-celular">Celular</Label>
+              <Input
+                id="loc-celular"
+                value={form.locatario_celular}
+                onChange={(e) => set("locatario_celular", e.target.value)}
+                inputMode="tel"
+              />
+            </div>
+          </div>
+
+          <div className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:col-span-2 sm:grid-cols-2">
+            <p className="text-muted-foreground text-xs font-semibold uppercase tracking-[0.18em] sm:col-span-2">
+              Dados do locador(a)
             </p>
             <div className="space-y-1.5">
-              <Label htmlFor="loc-endereco">Endereço (rua/avenida)</Label>
+              <Label htmlFor="loc-prop">Nome do locador</Label>
+              <Input
+                id="loc-prop"
+                value={form.proprietario}
+                onChange={(e) => set("proprietario", e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="loc-prop-email">E-mail do locador</Label>
+              <Input
+                id="loc-prop-email"
+                type="email"
+                value={form.proprietario_email}
+                onChange={(e) => set("proprietario_email", e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="loc-prop-celular">Celular do locador</Label>
+              <Input
+                id="loc-prop-celular"
+                value={form.proprietario_celular}
+                onChange={(e) => set("proprietario_celular", e.target.value)}
+                inputMode="tel"
+              />
+            </div>
+          </div>
+
+          <div className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:col-span-2 sm:grid-cols-2">
+            <p className="text-muted-foreground text-xs font-semibold uppercase tracking-[0.18em] sm:col-span-2">
+              Dados do imóvel
+            </p>
+            <div className="space-y-1.5">
+              <Label htmlFor="loc-endereco">Endereço</Label>
               <Input
                 id="loc-endereco"
                 value={form.endereco}
@@ -217,66 +352,100 @@ export function LocacaoDialog({
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="loc-descricao">Descrição do imóvel</Label>
+              <Textarea
+                id="loc-descricao"
+                rows={4}
+                value={form.descricao_imovel}
+                onChange={(e) => set("descricao_imovel", e.target.value)}
+              />
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="loc-prop">Proprietário</Label>
-            <Input
-              id="loc-prop"
-              value={form.proprietario}
-              onChange={(e) => set("proprietario", e.target.value)}
-            />
+
+          <div className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:col-span-2 sm:grid-cols-2">
+            <p className="text-muted-foreground text-xs font-semibold uppercase tracking-[0.18em] sm:col-span-2">
+              Dados da negociação
+            </p>
+            <div className="space-y-1.5">
+              <Label>Tipo de locação</Label>
+              <Select value={form.tipo_locacao} onValueChange={(v) => set("tipo_locacao", v)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="residencial">Residencial</SelectItem>
+                  <SelectItem value="comercial">Comercial</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="loc-prazo">Prazo</Label>
+              <Input
+                id="loc-prazo"
+                value={form.prazo}
+                onChange={(e) => set("prazo", e.target.value)}
+                placeholder="Ex.: 12 meses"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="loc-inicio">Início</Label>
+              <Input
+                id="loc-inicio"
+                type="date"
+                value={form.inicio_contrato}
+                onChange={(e) => set("inicio_contrato", e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="loc-valor">Valor do aluguel (R$)</Label>
+              <Input
+                id="loc-valor"
+                value={form.valor_aluguel}
+                onChange={(e) => set("valor_aluguel", e.target.value)}
+                inputMode="decimal"
+                placeholder="1500"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Vencimento</Label>
+              <Select value={form.vencimento_dia} onValueChange={(v) => set("vencimento_dia", v)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="4">Dia 04</SelectItem>
+                  <SelectItem value="10">Dia 10</SelectItem>
+                  <SelectItem value="20">Dia 20</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Administração</Label>
+              <Select value={form.administracao} onValueChange={(v) => set("administracao", v)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sim">Sim</SelectItem>
+                  <SelectItem value="nao">Não</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="loc-garantia">Garantia</Label>
+              <Input
+                id="loc-garantia"
+                value={form.garantia}
+                onChange={(e) => set("garantia", e.target.value)}
+                placeholder="Fiador, caução, seguro-fiança"
+              />
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="loc-locatario">Locatário</Label>
-            <Input
-              id="loc-locatario"
-              value={form.locatario}
-              onChange={(e) => set("locatario", e.target.value)}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="loc-valor">Valor do aluguel (R$)</Label>
-            <Input
-              id="loc-valor"
-              value={form.valor_aluguel}
-              onChange={(e) => set("valor_aluguel", e.target.value)}
-              inputMode="decimal"
-              placeholder="1500"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="loc-garantia">Garantia</Label>
-            <Input
-              id="loc-garantia"
-              value={form.garantia}
-              onChange={(e) => set("garantia", e.target.value)}
-              placeholder="Fiador, caução, seguro-fiança"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="loc-inicio">Início do contrato</Label>
-            <Input
-              id="loc-inicio"
-              type="date"
-              value={form.inicio_contrato}
-              onChange={(e) => set("inicio_contrato", e.target.value)}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="loc-venc">Vencimento mensal (dia)</Label>
-            <Input
-              id="loc-venc"
-              value={form.vencimento_dia}
-              onChange={(e) => set("vencimento_dia", e.target.value.replace(/\D/g, "").slice(0, 2))}
-              inputMode="numeric"
-            />
-          </div>
-          <div className="space-y-1.5 sm:col-span-2">
+
+          <div className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:col-span-2">
             <Label>Status da vistoria</Label>
-            <Select
-              value={form.status_vistoria}
-              onValueChange={(v) => set("status_vistoria", v)}
-            >
+            <Select value={form.status_vistoria} onValueChange={(v) => set("status_vistoria", v)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

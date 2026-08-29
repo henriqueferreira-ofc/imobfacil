@@ -175,8 +175,26 @@ export function LocacaoModule() {
     const lista = data ?? [];
     if (!termo) return lista;
     return lista.filter((l) =>
-      [l.endereco, l.numero_casa, l.bairro, l.cep, l.cidade, l.estado, l.proprietario, l.locatario, l.garantia]
-        .join(" ").toLowerCase().includes(termo),
+      [
+        l.endereco,
+        l.numero_casa,
+        l.bairro,
+        l.cep,
+        l.cidade,
+        l.estado,
+        l.proprietario,
+        l.proprietario_email,
+        l.proprietario_celular,
+        l.locatario,
+        l.locatario_email,
+        l.locatario_celular,
+        l.garantia,
+        l.tipo_locacao,
+        l.prazo,
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(termo),
     );
   }, [data, busca]);
 
@@ -234,15 +252,28 @@ export function LocacaoModule() {
               <dl className="mt-4 grid grid-cols-2 gap-4 text-sm lg:grid-cols-4">
                 <Campo label="Proprietário" valor={l.proprietario} />
                 <Campo label="Locatário" valor={l.locatario} />
-                <Campo label="Aluguel" valor={formatarMoeda(Number(l.valor_aluguel))} />
-                <Campo label="Garantia" valor={l.garantia} />
                 <Campo
-                  label="Início do contrato"
+                  label="Tipo"
+                  valor={l.tipo_locacao === "comercial" ? "Comercial" : "Residencial"}
+                />
+                <Campo label="Prazo" valor={l.prazo} />
+                <Campo label="Aluguel" valor={formatarMoeda(Number(l.valor_aluguel))} />
+                <Campo
+                  label="Início"
                   valor={l.inicio_contrato ? formatarData(l.inicio_contrato) : ""}
                 />
                 <Campo label="Vencimento" valor={`Dia ${l.vencimento_dia}`} />
+                <Campo label="Administração" valor={l.administracao ? "Sim" : "Não"} />
+                <Campo label="Garantia" valor={l.garantia} />
+                <Campo label="Locador celular" valor={l.proprietario_celular} />
+                <Campo label="Locatário celular" valor={l.locatario_celular} />
                 <Campo label="Atualizado" valor={formatarData(l.updated_at)} />
               </dl>
+              {l.descricao_imovel ? (
+                <p className="mt-4 border-t pt-3 text-xs whitespace-pre-line text-muted-foreground">
+                  {l.descricao_imovel}
+                </p>
+              ) : null}
               {l.observacoes ? (
                 <p className="mt-4 border-t pt-3 text-xs whitespace-pre-line text-muted-foreground">
                   {l.observacoes}
@@ -386,11 +417,7 @@ export function AdministracaoModule() {
         )}
       </div>
 
-      <AdministracaoDialog
-        open={dialogAberto}
-        onOpenChange={setDialogAberto}
-        registro={emEdicao}
-      />
+      <AdministracaoDialog open={dialogAberto} onOpenChange={setDialogAberto} registro={emEdicao} />
 
       <AlertDialog open={Boolean(paraExcluir)} onOpenChange={() => setParaExcluir(null)}>
         <AlertDialogContent>
