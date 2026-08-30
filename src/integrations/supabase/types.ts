@@ -71,31 +71,76 @@ export type Database = {
           codigo: string
           created_at: string
           created_by: string | null
+          data_pagamento: string | null
           descricao_imovel: string
+          empresa_bairro: string
+          empresa_cartao_cnpj_url: string
+          empresa_cidade: string
+          empresa_cnpj: string
+          empresa_comp_residencia_url: string
+          empresa_endereco: string
+          empresa_estado: string
+          empresa_insc_estadual: string
+          empresa_nome: string
+          empresa_outros_doc_url: string
           endereco: string
           estado: string
           garantia: string
+          garantia_caucao: boolean
           id: string
           imovel: string
+          imovel_conta_agua_url: string
+          imovel_conta_energia_url: string
+          imovel_outros_doc_url: string
           inicio_contrato: string | null
           locatario: string
           locatario_celular: string
+          locatario_comp_renda_url: string
+          locatario_comp_residencia_url: string
+          locatario_contato_referencia: string
+          locatario_cpf: string
+          locatario_doc_tipo: string
           locatario_doc_url: string
           locatario_email: string
           locatario_estado_civil: string
+          locatario_orgao_expedidor: string
           locatario_profissao: string
+          locatario_rg: string
           locatario_tipo_pessoa: string
           numero_casa: string
           observacoes: string
           prazo: string
           proprietario: string
           proprietario_celular: string
+          proprietario_comp_renda_url: string
+          proprietario_comp_residencia_url: string
+          proprietario_contato_referencia: string
+          proprietario_cpf: string
+          proprietario_doc_tipo: string
           proprietario_doc_url: string
           proprietario_email: string
+          proprietario_estado_civil: string
+          proprietario_orgao_expedidor: string
+          proprietario_profissao: string
+          proprietario_rg: string
+          resp_celular: string
+          resp_comp_renda_url: string
+          resp_comp_residencia_url: string
+          resp_contato_referencia: string
+          resp_cpf: string
+          resp_doc_tipo: string
+          resp_doc_url: string
+          resp_email: string
+          resp_estado_civil: string
+          resp_nome: string
+          resp_orgao_expedidor: string
+          resp_profissao: string
+          resp_rg: string
           status_vistoria: string
           tipo_locacao: string
           updated_at: string
           valor_aluguel: number
+          valor_caucao: number
           vencimento_dia: number
         }
         Insert: {
@@ -106,31 +151,76 @@ export type Database = {
           codigo?: string
           created_at?: string
           created_by?: string | null
+          data_pagamento?: string | null
           descricao_imovel?: string
+          empresa_bairro?: string
+          empresa_cartao_cnpj_url?: string
+          empresa_cidade?: string
+          empresa_cnpj?: string
+          empresa_comp_residencia_url?: string
+          empresa_endereco?: string
+          empresa_estado?: string
+          empresa_insc_estadual?: string
+          empresa_nome?: string
+          empresa_outros_doc_url?: string
           endereco?: string
           estado?: string
           garantia?: string
+          garantia_caucao?: boolean
           id?: string
           imovel?: string
+          imovel_conta_agua_url?: string
+          imovel_conta_energia_url?: string
+          imovel_outros_doc_url?: string
           inicio_contrato?: string | null
           locatario?: string
           locatario_celular?: string
+          locatario_comp_renda_url?: string
+          locatario_comp_residencia_url?: string
+          locatario_contato_referencia?: string
+          locatario_cpf?: string
+          locatario_doc_tipo?: string
           locatario_doc_url?: string
           locatario_email?: string
           locatario_estado_civil?: string
+          locatario_orgao_expedidor?: string
           locatario_profissao?: string
+          locatario_rg?: string
           locatario_tipo_pessoa?: string
           numero_casa?: string
           observacoes?: string
           prazo?: string
           proprietario?: string
           proprietario_celular?: string
+          proprietario_comp_renda_url?: string
+          proprietario_comp_residencia_url?: string
+          proprietario_contato_referencia?: string
+          proprietario_cpf?: string
+          proprietario_doc_tipo?: string
           proprietario_doc_url?: string
           proprietario_email?: string
+          proprietario_estado_civil?: string
+          proprietario_orgao_expedidor?: string
+          proprietario_profissao?: string
+          proprietario_rg?: string
+          resp_celular?: string
+          resp_comp_renda_url?: string
+          resp_comp_residencia_url?: string
+          resp_contato_referencia?: string
+          resp_cpf?: string
+          resp_doc_tipo?: string
+          resp_doc_url?: string
+          resp_email?: string
+          resp_estado_civil?: string
+          resp_nome?: string
+          resp_orgao_expedidor?: string
+          resp_profissao?: string
+          resp_rg?: string
           status_vistoria?: string
           tipo_locacao?: string
           updated_at?: string
           valor_aluguel?: number
+          valor_caucao?: number
           vencimento_dia?: number
         }
         Update: {
@@ -141,31 +231,76 @@ export type Database = {
           codigo?: string
           created_at?: string
           created_by?: string | null
+          data_pagamento?: string | null
           descricao_imovel?: string
+          empresa_bairro?: string
+          empresa_cartao_cnpj_url?: string
+          empresa_cidade?: string
+          empresa_cnpj?: string
+          empresa_comp_residencia_url?: string
+          empresa_endereco?: string
+          empresa_estado?: string
+          empresa_insc_estadual?: string
+          empresa_nome?: string
+          empresa_outros_doc_url?: string
           endereco?: string
           estado?: string
           garantia?: string
+          garantia_caucao?: boolean
           id?: string
           imovel?: string
+          imovel_conta_agua_url?: string
+          imovel_conta_energia_url?: string
+          imovel_outros_doc_url?: string
           inicio_contrato?: string | null
           locatario?: string
           locatario_celular?: string
+          locatario_comp_renda_url?: string
+          locatario_comp_residencia_url?: string
+          locatario_contato_referencia?: string
+          locatario_cpf?: string
+          locatario_doc_tipo?: string
           locatario_doc_url?: string
           locatario_email?: string
           locatario_estado_civil?: string
+          locatario_orgao_expedidor?: string
           locatario_profissao?: string
+          locatario_rg?: string
           locatario_tipo_pessoa?: string
           numero_casa?: string
           observacoes?: string
           prazo?: string
           proprietario?: string
           proprietario_celular?: string
+          proprietario_comp_renda_url?: string
+          proprietario_comp_residencia_url?: string
+          proprietario_contato_referencia?: string
+          proprietario_cpf?: string
+          proprietario_doc_tipo?: string
           proprietario_doc_url?: string
           proprietario_email?: string
+          proprietario_estado_civil?: string
+          proprietario_orgao_expedidor?: string
+          proprietario_profissao?: string
+          proprietario_rg?: string
+          resp_celular?: string
+          resp_comp_renda_url?: string
+          resp_comp_residencia_url?: string
+          resp_contato_referencia?: string
+          resp_cpf?: string
+          resp_doc_tipo?: string
+          resp_doc_url?: string
+          resp_email?: string
+          resp_estado_civil?: string
+          resp_nome?: string
+          resp_orgao_expedidor?: string
+          resp_profissao?: string
+          resp_rg?: string
           status_vistoria?: string
           tipo_locacao?: string
           updated_at?: string
           valor_aluguel?: number
+          valor_caucao?: number
           vencimento_dia?: number
         }
         Relationships: []
