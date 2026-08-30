@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { FileCheck2, Loader2, Paperclip, X } from "lucide-react";
 import {
@@ -120,6 +120,87 @@ locacaoVazia.status_vistoria = "em_analise";
 locacaoVazia.proprietario_doc_tipo = "rg";
 locacaoVazia.locatario_doc_tipo = "rg";
 locacaoVazia.resp_doc_tipo = "rg";
+
+const CAMPOS_LOCADOR: LocacaoCampo[] = [
+  "proprietario",
+  "proprietario_profissao",
+  "proprietario_estado_civil",
+  "proprietario_rg",
+  "proprietario_orgao_expedidor",
+  "proprietario_cpf",
+  "proprietario_email",
+  "proprietario_celular",
+  "proprietario_contato_referencia",
+  "proprietario_doc_tipo",
+  "proprietario_doc_url",
+  "proprietario_comp_residencia_url",
+  "proprietario_comp_renda_url",
+];
+
+const CAMPOS_LOCATARIO: LocacaoCampo[] = [
+  "locatario_tipo_pessoa",
+  "locatario",
+  "locatario_estado_civil",
+  "locatario_profissao",
+  "locatario_rg",
+  "locatario_orgao_expedidor",
+  "locatario_cpf",
+  "locatario_email",
+  "locatario_celular",
+  "locatario_contato_referencia",
+  "locatario_doc_tipo",
+  "locatario_doc_url",
+  "locatario_comp_residencia_url",
+  "locatario_comp_renda_url",
+];
+
+const CAMPOS_EMPRESA: LocacaoCampo[] = [
+  "locatario_tipo_pessoa",
+  "empresa_nome",
+  "empresa_cnpj",
+  "empresa_insc_estadual",
+  "empresa_endereco",
+  "empresa_bairro",
+  "empresa_cidade",
+  "empresa_estado",
+  "empresa_cartao_cnpj_url",
+  "empresa_comp_residencia_url",
+  "empresa_outros_doc_url",
+];
+
+const CAMPOS_RESPONSAVEL_EMPRESA: LocacaoCampo[] = [
+  "resp_nome",
+  "resp_estado_civil",
+  "resp_profissao",
+  "resp_rg",
+  "resp_orgao_expedidor",
+  "resp_cpf",
+  "resp_email",
+  "resp_celular",
+  "resp_contato_referencia",
+  "resp_doc_tipo",
+  "resp_doc_url",
+  "resp_comp_residencia_url",
+  "resp_comp_renda_url",
+];
+
+function normalizarBusca(valor: string) {
+  return valor
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function valoresUnicos(registros: Locacao[], campo: keyof Locacao) {
+  return Array.from(
+    new Set(
+      registros
+        .map((registro) => String(registro[campo] ?? "").trim())
+        .filter((valor) => valor.length > 0),
+    ),
+  ).sort((a, b) => a.localeCompare(b, "pt-BR"));
+}
 
 function AnexoBotao({
   valor,
@@ -254,9 +335,23 @@ export function LocacaoDialog({
 }) {
   const queryClient = useQueryClient();
   const [form, setForm] = useState<LocacaoForm>(locacaoVazia);
+  const autopreenchidosRef = useRef<Record<string, string>>({});
+  const { data: historicoLocacoes = [] } = useQuery({
+    queryKey: ["locacoes-autopreenchimento"],
+    enabled: open && !publico,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("locacoes")
+        .select("*")
+        .order("updated_at", { ascending: false });
+      if (error) throw error;
+      return data as unknown as Locacao[];
+    },
+  });
 
   useEffect(() => {
     if (!open) return;
+    autopreenchidosRef.current = {};
     if (!registro) {
       setForm(locacaoVazia);
       return;
@@ -384,22 +479,75 @@ export function LocacaoDialog({
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
+  function buscarLocacao(campo: keyof Locacao, valor: string) {
+    const termo = normalizarBusca(valor);
+    if (termo.length < 3) return undefined;
+    return historicoLocacoes.find((item) => normalizarBusca(String(item[campo] ?? "")) === termo);
+  }
+
+  function preencherCampos(registroBase: Locacao, campos: LocacaoCampo[], mensagem: string) {
+    const registroQualquer = registroBase as unknown as Record<string, unknown>;
+    setForm((prev) => {
+      const proximo = { ...prev };
+      for (const campo of campos) {
+        const valor = registroQualquer[campo];
+        if (valor === null || valor === undefined) continue;
+        proximo[campo] = typeof valor === "boolean" ? (valor ? "sim" : "nao") : String(valor);
+      }
+      return proximo;
+    });
+    toast.success(mensagem);
+  }
+
+  function tentarAutopreencher(
+    campoBusca: keyof Locacao,
+    campos: LocacaoCampo[],
+    mensagem: string,
+    valor: string,
+  ) {
+    const termo = normalizarBusca(valor);
+    if (autopreenchidosRef.current[String(campoBusca)] === termo) return;
+    const encontrado = buscarLocacao(campoBusca, valor);
+    if (encontrado) {
+      autopreenchidosRef.current[String(campoBusca)] = termo;
+      preencherCampos(encontrado, campos, mensagem);
+    }
+  }
+
   function campoTexto(
     campo: LocacaoCampo,
     label: string,
     tipo?: string,
     modo?: "tel" | "numeric" | "decimal" | "email",
+    autocomplete?: {
+      opcoes: string[];
+      onEncontrar: (valor: string) => void;
+    },
   ) {
+    const listId = autocomplete ? `loc-${campo}-sugestoes` : undefined;
+
     return (
       <div className="space-y-1.5">
         <Label htmlFor={`loc-${campo}`}>{label}</Label>
         <Input
           id={`loc-${campo}`}
+          list={listId}
           type={tipo}
           inputMode={modo}
           value={form[campo]}
-          onChange={(e) => set(campo, e.target.value)}
+          onChange={(e) => {
+            set(campo, e.target.value);
+            autocomplete?.onEncontrar(e.target.value);
+          }}
+          onBlur={(e) => autocomplete?.onEncontrar(e.target.value)}
         />
+        {autocomplete ? (
+          <datalist id={listId}>
+            {autocomplete.opcoes.map((opcao) => (
+              <option key={opcao} value={opcao} />
+            ))}
+          </datalist>
+        ) : null}
       </div>
     );
   }
@@ -445,6 +593,11 @@ export function LocacaoDialog({
   }
 
   const pessoaJuridica = form.locatario_tipo_pessoa === "juridica";
+  const sugestoesLocadores = valoresUnicos(historicoLocacoes, "proprietario");
+  const sugestoesLocatarios = valoresUnicos(historicoLocacoes, "locatario");
+  const sugestoesEmpresas = valoresUnicos(historicoLocacoes, "empresa_nome");
+  const sugestoesResponsaveis = valoresUnicos(historicoLocacoes, "resp_nome");
+  const sugestoesCorretores = valoresUnicos(historicoLocacoes, "corretor");
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -470,7 +623,16 @@ export function LocacaoDialog({
           {/* LOCADOR */}
           <section className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
             <BlocoTitulo>Locador</BlocoTitulo>
-            {campoTexto("proprietario", "Nome")}
+            {campoTexto("proprietario", "Nome", undefined, undefined, {
+              opcoes: sugestoesLocadores,
+              onEncontrar: (valor) =>
+                tentarAutopreencher(
+                  "proprietario",
+                  CAMPOS_LOCADOR,
+                  "Dados do locador preenchidos pelo histórico",
+                  valor,
+                ),
+            })}
             {campoTexto("proprietario_profissao", "Profissão")}
             <CampoSelect
               campo="proprietario_estado_civil"
@@ -514,7 +676,16 @@ export function LocacaoDialog({
 
             {!pessoaJuridica ? (
               <>
-                {campoTexto("locatario", "Nome")}
+                {campoTexto("locatario", "Nome", undefined, undefined, {
+                  opcoes: sugestoesLocatarios,
+                  onEncontrar: (valor) =>
+                    tentarAutopreencher(
+                      "locatario",
+                      CAMPOS_LOCATARIO,
+                      "Dados do locatário preenchidos pelo histórico",
+                      valor,
+                    ),
+                })}
                 <CampoSelect
                   campo="locatario_estado_civil"
                   label="Estado civil"
@@ -543,7 +714,16 @@ export function LocacaoDialog({
               </>
             ) : (
               <>
-                {campoTexto("empresa_nome", "Empresa")}
+                {campoTexto("empresa_nome", "Empresa", undefined, undefined, {
+                  opcoes: sugestoesEmpresas,
+                  onEncontrar: (valor) =>
+                    tentarAutopreencher(
+                      "empresa_nome",
+                      CAMPOS_EMPRESA,
+                      "Dados da empresa preenchidos pelo histórico",
+                      valor,
+                    ),
+                })}
                 {campoTexto("empresa_cnpj", "CNPJ")}
                 {campoTexto("empresa_insc_estadual", "Insc. estadual")}
                 {campoTexto("empresa_endereco", "Endereço")}
@@ -569,7 +749,16 @@ export function LocacaoDialog({
                 />
 
                 <BlocoTitulo>Responsável pela empresa</BlocoTitulo>
-                {campoTexto("resp_nome", "Nome do responsável")}
+                {campoTexto("resp_nome", "Nome do responsável", undefined, undefined, {
+                  opcoes: sugestoesResponsaveis,
+                  onEncontrar: (valor) =>
+                    tentarAutopreencher(
+                      "resp_nome",
+                      CAMPOS_RESPONSAVEL_EMPRESA,
+                      "Dados do responsável preenchidos pelo histórico",
+                      valor,
+                    ),
+                })}
                 <CampoSelect
                   campo="resp_estado_civil"
                   label="Estado civil"
@@ -657,7 +846,16 @@ export function LocacaoDialog({
           <section className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
             <BlocoTitulo>Dados da negociação</BlocoTitulo>
             <div className="space-y-1.5 sm:col-span-2">
-              {campoTexto("corretor", "Corretor Responsável")}
+              {campoTexto("corretor", "Corretor Responsável", undefined, undefined, {
+                opcoes: sugestoesCorretores,
+                onEncontrar: (valor) =>
+                  tentarAutopreencher(
+                    "corretor",
+                    ["corretor"],
+                    "Corretor preenchido pelo histórico",
+                    valor,
+                  ),
+              })}
             </div>
             <CampoSelect
               campo="administracao"

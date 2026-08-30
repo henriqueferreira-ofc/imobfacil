@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Paperclip, FileCheck2, Loader2, X } from "lucide-react";
 import {
@@ -79,6 +79,24 @@ const vazio: FormState = {
 };
 
 type AnexoKey = "matricula_doc_url" | "cif_doc_url" | "contrato_doc_url";
+
+function normalizarBusca(valor: string) {
+  return valor
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function valoresUnicos(registros: Protocolo[], campo: keyof Protocolo) {
+  return Array.from(
+    new Set(
+      registros
+        .map((registro) => String(registro[campo] ?? "").trim())
+        .filter((valor) => valor.length > 0),
+    ),
+  ).sort((a, b) => a.localeCompare(b, "pt-BR"));
+}
 
 function AnexoDocumento({
   valor,
@@ -192,9 +210,23 @@ export function ProtocoloDialog({
 }) {
   const queryClient = useQueryClient();
   const [form, setForm] = useState<FormState>(vazio);
+  const autopreenchidosRef = useRef<Record<string, string>>({});
+  const { data: historicoProtocolos = [] } = useQuery({
+    queryKey: ["protocolos-autopreenchimento"],
+    enabled: open,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("protocolos")
+        .select("*")
+        .order("updated_at", { ascending: false });
+      if (error) throw error;
+      return data as Protocolo[];
+    },
+  });
 
   useEffect(() => {
     if (!open) return;
+    autopreenchidosRef.current = {};
     setForm(protocolo ? { ...vazio, ...protocolo } : vazio);
   }, [open, protocolo]);
 
@@ -233,6 +265,22 @@ export function ProtocoloDialog({
     setForm((prev) => ({ ...prev, [key]: path }));
   }
 
+  function tentarAutopreencher(campo: keyof FormState, valor: string, mensagem: string) {
+    const termo = normalizarBusca(valor);
+    if (termo.length < 3 || autopreenchidosRef.current[String(campo)] === termo) return;
+    const encontrado = historicoProtocolos.find(
+      (item) => normalizarBusca(String(item[campo] ?? "")) === termo,
+    );
+    if (!encontrado) return;
+    autopreenchidosRef.current[String(campo)] = termo;
+    set(campo, String(encontrado[campo] ?? "") as FormState[typeof campo]);
+    toast.success(mensagem);
+  }
+
+  const sugestoesVendedores = valoresUnicos(historicoProtocolos, "vendedores");
+  const sugestoesCompradores = valoresUnicos(historicoProtocolos, "compradores");
+  const sugestoesCorretores = valoresUnicos(historicoProtocolos, "corretor");
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90dvh] w-[calc(100vw-2rem)] overflow-y-auto sm:max-w-2xl">
@@ -262,10 +310,30 @@ export function ProtocoloDialog({
               </Label>
               <Input
                 id="vendedores"
+                list="protocolo-vendedores-sugestoes"
                 value={form.vendedores}
-                onChange={(e) => set("vendedores", e.target.value)}
+                onChange={(e) => {
+                  set("vendedores", e.target.value);
+                  tentarAutopreencher(
+                    "vendedores",
+                    e.target.value,
+                    "Vendedor(es) preenchido pelo histórico",
+                  );
+                }}
+                onBlur={(e) =>
+                  tentarAutopreencher(
+                    "vendedores",
+                    e.target.value,
+                    "Vendedor(es) preenchido pelo histórico",
+                  )
+                }
                 required
               />
+              <datalist id="protocolo-vendedores-sugestoes">
+                {sugestoesVendedores.map((opcao) => (
+                  <option key={opcao} value={opcao} />
+                ))}
+              </datalist>
             </div>
 
             <BlocoTitulo>Comprador(es)</BlocoTitulo>
@@ -275,10 +343,30 @@ export function ProtocoloDialog({
               </Label>
               <Input
                 id="compradores"
+                list="protocolo-compradores-sugestoes"
                 value={form.compradores}
-                onChange={(e) => set("compradores", e.target.value)}
+                onChange={(e) => {
+                  set("compradores", e.target.value);
+                  tentarAutopreencher(
+                    "compradores",
+                    e.target.value,
+                    "Comprador(es) preenchido pelo histórico",
+                  );
+                }}
+                onBlur={(e) =>
+                  tentarAutopreencher(
+                    "compradores",
+                    e.target.value,
+                    "Comprador(es) preenchido pelo histórico",
+                  )
+                }
                 required
               />
+              <datalist id="protocolo-compradores-sugestoes">
+                {sugestoesCompradores.map((opcao) => (
+                  <option key={opcao} value={opcao} />
+                ))}
+              </datalist>
             </div>
 
             <BlocoTitulo>Corretor responsável</BlocoTitulo>
@@ -288,9 +376,29 @@ export function ProtocoloDialog({
               </Label>
               <Input
                 id="corretor"
+                list="protocolo-corretores-sugestoes"
                 value={form.corretor}
-                onChange={(e) => set("corretor", e.target.value)}
+                onChange={(e) => {
+                  set("corretor", e.target.value);
+                  tentarAutopreencher(
+                    "corretor",
+                    e.target.value,
+                    "Corretor preenchido pelo histórico",
+                  );
+                }}
+                onBlur={(e) =>
+                  tentarAutopreencher(
+                    "corretor",
+                    e.target.value,
+                    "Corretor preenchido pelo histórico",
+                  )
+                }
               />
+              <datalist id="protocolo-corretores-sugestoes">
+                {sugestoesCorretores.map((opcao) => (
+                  <option key={opcao} value={opcao} />
+                ))}
+              </datalist>
             </div>
           </section>
 
