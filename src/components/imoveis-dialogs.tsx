@@ -25,67 +25,97 @@ import { supabase } from "@/integrations/supabase/client";
 import { ESTADOS_UF, formatarCep } from "@/lib/protocolos";
 import { STATUS_VISTORIA_LABEL, type ImovelAdministrado, type Locacao } from "@/lib/imoveis";
 
-type LocacaoForm = {
-  endereco: string;
-  numero_casa: string;
-  bairro: string;
-  cep: string;
-  cidade: string;
-  estado: string;
-  locatario_tipo_pessoa: string;
-  proprietario: string;
-  proprietario_email: string;
-  proprietario_celular: string;
-  proprietario_doc_url: string;
-  locatario: string;
-  locatario_profissao: string;
-  locatario_estado_civil: string;
-  locatario_email: string;
-  locatario_celular: string;
-  locatario_doc_url: string;
-  descricao_imovel: string;
-  tipo_locacao: string;
-  prazo: string;
-  administracao: string;
-  valor_aluguel: string;
-  inicio_contrato: string;
-  vencimento_dia: string;
-  status_vistoria: string;
-  observacoes: string;
-};
+const CAMPOS_LOCACAO_TEXTO = [
+  "endereco",
+  "numero_casa",
+  "bairro",
+  "cep",
+  "cidade",
+  "estado",
+  "proprietario",
+  "proprietario_profissao",
+  "proprietario_estado_civil",
+  "proprietario_rg",
+  "proprietario_orgao_expedidor",
+  "proprietario_cpf",
+  "proprietario_email",
+  "proprietario_celular",
+  "proprietario_contato_referencia",
+  "proprietario_doc_tipo",
+  "proprietario_doc_url",
+  "proprietario_comp_residencia_url",
+  "proprietario_comp_renda_url",
+  "locatario_tipo_pessoa",
+  "locatario",
+  "locatario_estado_civil",
+  "locatario_profissao",
+  "locatario_rg",
+  "locatario_orgao_expedidor",
+  "locatario_cpf",
+  "locatario_email",
+  "locatario_celular",
+  "locatario_contato_referencia",
+  "locatario_doc_tipo",
+  "locatario_doc_url",
+  "locatario_comp_residencia_url",
+  "locatario_comp_renda_url",
+  "empresa_nome",
+  "empresa_cnpj",
+  "empresa_insc_estadual",
+  "empresa_endereco",
+  "empresa_bairro",
+  "empresa_cidade",
+  "empresa_estado",
+  "empresa_cartao_cnpj_url",
+  "empresa_comp_residencia_url",
+  "empresa_outros_doc_url",
+  "resp_nome",
+  "resp_estado_civil",
+  "resp_profissao",
+  "resp_rg",
+  "resp_orgao_expedidor",
+  "resp_cpf",
+  "resp_email",
+  "resp_celular",
+  "resp_contato_referencia",
+  "resp_doc_tipo",
+  "resp_doc_url",
+  "resp_comp_residencia_url",
+  "resp_comp_renda_url",
+  "imovel_conta_energia_url",
+  "imovel_conta_agua_url",
+  "imovel_outros_doc_url",
+  "descricao_imovel",
+  "tipo_locacao",
+  "prazo",
+  "administracao",
+  "garantia_caucao",
+  "valor_aluguel",
+  "valor_caucao",
+  "inicio_contrato",
+  "data_pagamento",
+  "status_vistoria",
+  "observacoes",
+] as const;
 
-const locacaoVazia: LocacaoForm = {
-  endereco: "",
-  numero_casa: "",
-  bairro: "",
-  cep: "",
-  cidade: "",
-  estado: "",
-  locatario_tipo_pessoa: "fisica",
-  proprietario: "",
-  proprietario_email: "",
-  proprietario_celular: "",
-  proprietario_doc_url: "",
-  locatario: "",
-  locatario_profissao: "",
-  locatario_estado_civil: "",
-  locatario_email: "",
-  locatario_celular: "",
-  locatario_doc_url: "",
-  descricao_imovel: "",
-  tipo_locacao: "residencial",
-  prazo: "",
-  administracao: "nao",
-  valor_aluguel: "",
-  inicio_contrato: "",
-  vencimento_dia: "4",
-  status_vistoria: "em_analise",
-  observacoes: "",
-};
+type LocacaoCampo = (typeof CAMPOS_LOCACAO_TEXTO)[number];
+type LocacaoForm = Record<LocacaoCampo, string>;
 
-type LocacaoAnexoKey = "proprietario_doc_url" | "locatario_doc_url";
+const locacaoVazia: LocacaoForm = CAMPOS_LOCACAO_TEXTO.reduce((acc, campo) => {
+  acc[campo] = "";
+  return acc;
+}, {} as LocacaoForm);
 
-function AnexoLocacaoDocumento({
+locacaoVazia.locatario_tipo_pessoa = "fisica";
+locacaoVazia.tipo_locacao = "residencial";
+locacaoVazia.administracao = "nao";
+locacaoVazia.garantia_caucao = "nao";
+locacaoVazia.status_vistoria = "em_analise";
+locacaoVazia.proprietario_doc_tipo = "rg";
+locacaoVazia.locatario_doc_tipo = "rg";
+locacaoVazia.resp_doc_tipo = "rg";
+
+function AnexoBotao({
   valor,
   onChange,
   label,
@@ -163,16 +193,37 @@ function AnexoLocacaoDocumento({
           size="sm"
           disabled={enviando}
           onClick={() => inputRef.current?.click()}
-          title={`Anexar documento de ${label}`}
+          title={`Anexar ${label}`}
         >
-          {enviando ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <Paperclip className="size-4" />
-          )}
+          {enviando ? <Loader2 className="size-4 animate-spin" /> : <Paperclip className="size-4" />}
         </Button>
       )}
     </div>
+  );
+}
+
+function LinhaAnexo({
+  nome,
+  valor,
+  onChange,
+}: {
+  nome: string;
+  valor: string;
+  onChange: (path: string) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-2 rounded-lg border bg-background px-3 py-2">
+      <span className="min-w-0 truncate text-sm">{nome}</span>
+      <AnexoBotao label={nome} valor={valor} onChange={onChange} />
+    </div>
+  );
+}
+
+function BlocoTitulo({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-muted-foreground text-xs font-semibold tracking-[0.18em] uppercase sm:col-span-2">
+      {children}
+    </p>
   );
 }
 
@@ -194,38 +245,22 @@ export function LocacaoDialog({
 
   useEffect(() => {
     if (!open) return;
-    setForm(
-      registro
-        ? {
-            endereco: registro.endereco ?? "",
-            numero_casa: registro.numero_casa ?? "",
-            bairro: registro.bairro ?? "",
-            cep: registro.cep ?? "",
-            cidade: registro.cidade ?? "",
-            estado: registro.estado ?? "",
-            locatario_tipo_pessoa: registro.locatario_tipo_pessoa ?? "fisica",
-            proprietario: registro.proprietario ?? "",
-            proprietario_email: registro.proprietario_email ?? "",
-            proprietario_celular: registro.proprietario_celular ?? "",
-            proprietario_doc_url: registro.proprietario_doc_url ?? "",
-            locatario: registro.locatario ?? "",
-            locatario_profissao: registro.locatario_profissao ?? "",
-            locatario_estado_civil: registro.locatario_estado_civil ?? "",
-            locatario_email: registro.locatario_email ?? "",
-            locatario_celular: registro.locatario_celular ?? "",
-            locatario_doc_url: registro.locatario_doc_url ?? "",
-            descricao_imovel: registro.descricao_imovel ?? "",
-            tipo_locacao: registro.tipo_locacao ?? "residencial",
-            prazo: registro.prazo ?? "",
-            administracao: registro.administracao ? "sim" : "nao",
-            valor_aluguel: String(registro.valor_aluguel ?? ""),
-            inicio_contrato: registro.inicio_contrato ?? "",
-            vencimento_dia: String(registro.vencimento_dia ?? 4),
-            status_vistoria: registro.status_vistoria ?? "em_analise",
-            observacoes: registro.observacoes ?? "",
-          }
-        : locacaoVazia,
-    );
+    if (!registro) {
+      setForm(locacaoVazia);
+      return;
+    }
+    const registroQualquer = registro as unknown as Record<string, unknown>;
+    const proximo = { ...locacaoVazia };
+    for (const campo of CAMPOS_LOCACAO_TEXTO) {
+      const valor = registroQualquer[campo];
+      if (valor === null || valor === undefined) continue;
+      if (typeof valor === "boolean") {
+        proximo[campo] = valor ? "sim" : "nao";
+      } else {
+        proximo[campo] = String(valor);
+      }
+    }
+    setForm(proximo);
   }, [open, registro]);
 
   const salvar = useMutation({
@@ -237,25 +272,69 @@ export function LocacaoDialog({
         cep: form.cep,
         cidade: form.cidade,
         estado: form.estado,
-        locatario_tipo_pessoa: form.locatario_tipo_pessoa,
         proprietario: form.proprietario,
+        proprietario_profissao: form.proprietario_profissao,
+        proprietario_estado_civil: form.proprietario_estado_civil,
+        proprietario_rg: form.proprietario_rg,
+        proprietario_orgao_expedidor: form.proprietario_orgao_expedidor,
+        proprietario_cpf: form.proprietario_cpf,
         proprietario_email: form.proprietario_email,
         proprietario_celular: form.proprietario_celular,
+        proprietario_contato_referencia: form.proprietario_contato_referencia,
+        proprietario_doc_tipo: form.proprietario_doc_tipo,
         proprietario_doc_url: form.proprietario_doc_url,
+        proprietario_comp_residencia_url: form.proprietario_comp_residencia_url,
+        proprietario_comp_renda_url: form.proprietario_comp_renda_url,
+        locatario_tipo_pessoa: form.locatario_tipo_pessoa,
         locatario: form.locatario,
-        locatario_profissao: form.locatario_profissao,
         locatario_estado_civil: form.locatario_estado_civil,
+        locatario_profissao: form.locatario_profissao,
+        locatario_rg: form.locatario_rg,
+        locatario_orgao_expedidor: form.locatario_orgao_expedidor,
+        locatario_cpf: form.locatario_cpf,
         locatario_email: form.locatario_email,
         locatario_celular: form.locatario_celular,
+        locatario_contato_referencia: form.locatario_contato_referencia,
+        locatario_doc_tipo: form.locatario_doc_tipo,
         locatario_doc_url: form.locatario_doc_url,
+        locatario_comp_residencia_url: form.locatario_comp_residencia_url,
+        locatario_comp_renda_url: form.locatario_comp_renda_url,
+        empresa_nome: form.empresa_nome,
+        empresa_cnpj: form.empresa_cnpj,
+        empresa_insc_estadual: form.empresa_insc_estadual,
+        empresa_endereco: form.empresa_endereco,
+        empresa_bairro: form.empresa_bairro,
+        empresa_cidade: form.empresa_cidade,
+        empresa_estado: form.empresa_estado,
+        empresa_cartao_cnpj_url: form.empresa_cartao_cnpj_url,
+        empresa_comp_residencia_url: form.empresa_comp_residencia_url,
+        empresa_outros_doc_url: form.empresa_outros_doc_url,
+        resp_nome: form.resp_nome,
+        resp_estado_civil: form.resp_estado_civil,
+        resp_profissao: form.resp_profissao,
+        resp_rg: form.resp_rg,
+        resp_orgao_expedidor: form.resp_orgao_expedidor,
+        resp_cpf: form.resp_cpf,
+        resp_email: form.resp_email,
+        resp_celular: form.resp_celular,
+        resp_contato_referencia: form.resp_contato_referencia,
+        resp_doc_tipo: form.resp_doc_tipo,
+        resp_doc_url: form.resp_doc_url,
+        resp_comp_residencia_url: form.resp_comp_residencia_url,
+        resp_comp_renda_url: form.resp_comp_renda_url,
+        imovel_conta_energia_url: form.imovel_conta_energia_url,
+        imovel_conta_agua_url: form.imovel_conta_agua_url,
+        imovel_outros_doc_url: form.imovel_outros_doc_url,
         descricao_imovel: form.descricao_imovel,
         tipo_locacao: form.tipo_locacao,
         prazo: form.prazo,
         administracao: form.administracao === "sim",
+        garantia_caucao: form.garantia_caucao === "sim",
         valor_aluguel: Number(form.valor_aluguel.replace(",", ".")) || 0,
+        valor_caucao: Number(form.valor_caucao.replace(",", ".")) || 0,
         inicio_contrato: form.inicio_contrato || null,
-        vencimento_dia: Number(form.vencimento_dia) || 4,
-        status_vistoria: form.status_vistoria,
+        data_pagamento: form.data_pagamento || null,
+        status_vistoria: form.status_vistoria || "em_analise",
         observacoes: form.observacoes,
       };
       if (publico) {
@@ -268,7 +347,7 @@ export function LocacaoDialog({
       if (registro) {
         const { error } = await supabase.from("locacoes").update(payload).eq("id", registro.id);
         if (error) throw error;
-        return;
+        return undefined;
       }
       const { error } = await supabase.from("locacoes").insert(payload);
       if (error) throw error;
@@ -288,17 +367,98 @@ export function LocacaoDialog({
     onError: (error: Error) => toast.error("Erro ao salvar", { description: error.message }),
   });
 
-  function set<K extends keyof LocacaoForm>(key: K, value: string) {
+  function set(key: LocacaoCampo, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function setAnexo(key: LocacaoAnexoKey, path: string) {
-    setForm((prev) => ({ ...prev, [key]: path }));
+  function CampoTexto({
+    campo,
+    label,
+    tipo,
+    modo,
+  }: {
+    campo: LocacaoCampo;
+    label: string;
+    tipo?: string;
+    modo?: "tel" | "numeric" | "decimal" | "email";
+  }) {
+    return (
+      <div className="space-y-1.5">
+        <Label htmlFor={`loc-${campo}`}>{label}</Label>
+        <Input
+          id={`loc-${campo}`}
+          type={tipo}
+          inputMode={modo}
+          value={form[campo]}
+          onChange={(e) => set(campo, e.target.value)}
+        />
+      </div>
+    );
   }
+
+  function CampoSelect({
+    campo,
+    label,
+    opcoes,
+    placeholder,
+  }: {
+    campo: LocacaoCampo;
+    label: string;
+    opcoes: Array<{ value: string; label: string }>;
+    placeholder?: string;
+  }) {
+    return (
+      <div className="space-y-1.5">
+        <Label>{label}</Label>
+        <Select value={form[campo]} onValueChange={(v) => set(campo, v)}>
+          <SelectTrigger>
+            <SelectValue placeholder={placeholder ?? "Selecione"} />
+          </SelectTrigger>
+          <SelectContent>
+            {opcoes.map((o) => (
+              <SelectItem key={o.value} value={o.value}>
+                {o.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    );
+  }
+
+  function DocumentoIdentificacao({
+    campoTipo,
+    campoAnexo,
+  }: {
+    campoTipo: LocacaoCampo;
+    campoAnexo: LocacaoCampo;
+  }) {
+    return (
+      <div className="grid gap-2 sm:col-span-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+        <CampoSelect
+          campo={campoTipo}
+          label="Documento de identificação"
+          opcoes={[
+            { value: "rg", label: "RG" },
+            { value: "cnh", label: "CNH" },
+          ]}
+        />
+        <div className="sm:pb-1">
+          <AnexoBotao
+            label="documento de identificação"
+            valor={form[campoAnexo]}
+            onChange={(path) => set(campoAnexo, path)}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  const pessoaJuridica = form.locatario_tipo_pessoa === "juridica";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90dvh] w-[calc(100vw-2rem)] overflow-y-auto sm:max-w-2xl">
+      <DialogContent className="max-h-[90dvh] w-[calc(100vw-2rem)] overflow-y-auto sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle className="font-display">
             {registro ? "Editar locação" : "Nova locação"}
@@ -306,202 +466,181 @@ export function LocacaoDialog({
           <DialogDescription>
             {publico
               ? "Preencha os dados da locação. O administrador acompanhará o cadastro pelo painel."
-              : "Contrato, partes envolvidas, aluguel e status da vistoria."}
+              : "Locador, locatário, imóvel e dados da negociação."}
           </DialogDescription>
         </DialogHeader>
 
         <form
-          className="grid gap-4 sm:grid-cols-2"
+          className="grid gap-4"
           onSubmit={(e) => {
             e.preventDefault();
             salvar.mutate();
           }}
         >
-          <div className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:col-span-2">
-            <div className="grid items-stretch gap-4 md:grid-cols-2">
-              <div className="flex h-full flex-col gap-2">
-                <h3 className="text-center text-sm font-bold uppercase tracking-wide">Locador</h3>
-                <section className="relative grid h-full content-start gap-4 rounded-xl border bg-background/70 p-3">
-                  <div className="absolute right-3 top-3">
-                    <AnexoLocacaoDocumento
-                      label="locador"
-                      valor={form.proprietario_doc_url}
-                      onChange={(path) => setAnexo("proprietario_doc_url", path)}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="loc-prop">Locador</Label>
-                    <Input
-                      id="loc-prop"
-                      value={form.proprietario}
-                      onChange={(e) => set("proprietario", e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="loc-prop-email">E-mail</Label>
-                    <Input
-                      id="loc-prop-email"
-                      type="email"
-                      value={form.proprietario_email}
-                      onChange={(e) => set("proprietario_email", e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="loc-prop-celular">Celular</Label>
-                    <Input
-                      id="loc-prop-celular"
-                      value={form.proprietario_celular}
-                      onChange={(e) => set("proprietario_celular", e.target.value)}
-                      inputMode="tel"
-                    />
-                  </div>
-                </section>
-              </div>
+          {/* LOCADOR */}
+          <section className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
+            <BlocoTitulo>Locador</BlocoTitulo>
+            <CampoTexto campo="proprietario" label="Nome" />
+            <CampoTexto campo="proprietario_profissao" label="Profissão" />
+            <CampoSelect
+              campo="proprietario_estado_civil"
+              label="Estado civil"
+              opcoes={ESTADO_CIVIL_OPCOES}
+            />
+            <CampoTexto campo="proprietario_rg" label="RG" />
+            <CampoTexto campo="proprietario_orgao_expedidor" label="Órgão expedidor" />
+            <CampoTexto campo="proprietario_cpf" label="CPF" />
+            <CampoTexto campo="proprietario_email" label="E-mail" tipo="email" />
+            <CampoTexto campo="proprietario_celular" label="Celular" modo="tel" />
+            <CampoTexto campo="proprietario_contato_referencia" label="Contato de referência" />
 
-              <div className="flex h-full flex-col gap-2">
-                <h3 className="text-center text-sm font-bold uppercase tracking-wide">Locatário</h3>
-                <section className="relative grid h-full content-start gap-4 rounded-xl border bg-background/70 p-3">
-                  <div className="absolute right-3 top-3">
-                    <AnexoLocacaoDocumento
-                      label="locatário"
-                      valor={form.locatario_doc_url}
-                      onChange={(path) => setAnexo("locatario_doc_url", path)}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Tipo de pessoa</Label>
-                    <Select
-                      value={form.locatario_tipo_pessoa}
-                      onValueChange={(v) => set("locatario_tipo_pessoa", v)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="fisica">Pessoa física</SelectItem>
-                        <SelectItem value="juridica">Pessoa jurídica</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="loc-locatario">Locatário</Label>
-                    <Input
-                      id="loc-locatario"
-                      value={form.locatario}
-                      onChange={(e) => set("locatario", e.target.value)}
-                    />
-                  </div>
-                  <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="loc-profissao">Profissão</Label>
-                      <Input
-                        id="loc-profissao"
-                        value={form.locatario_profissao}
-                        onChange={(e) => set("locatario_profissao", e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label>Estado civil</Label>
-                      <Select
-                        value={form.locatario_estado_civil}
-                        onValueChange={(v) => set("locatario_estado_civil", v)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="casado">Casado</SelectItem>
-                          <SelectItem value="solteiro">Solteiro</SelectItem>
-                          <SelectItem value="divorciado">Divorciado</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="loc-email">E-mail</Label>
-                    <Input
-                      id="loc-email"
-                      type="email"
-                      value={form.locatario_email}
-                      onChange={(e) => set("locatario_email", e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="loc-celular">Celular</Label>
-                    <Input
-                      id="loc-celular"
-                      value={form.locatario_celular}
-                      onChange={(e) => set("locatario_celular", e.target.value)}
-                      inputMode="tel"
-                    />
-                  </div>
-                </section>
-              </div>
+            <BlocoTitulo>Documentos do locador</BlocoTitulo>
+            <DocumentoIdentificacao
+              campoTipo="proprietario_doc_tipo"
+              campoAnexo="proprietario_doc_url"
+            />
+            <LinhaAnexo
+              nome="Comprovante de residência"
+              valor={form.proprietario_comp_residencia_url}
+              onChange={(p) => set("proprietario_comp_residencia_url", p)}
+            />
+            <LinhaAnexo
+              nome="Comprovante de renda"
+              valor={form.proprietario_comp_renda_url}
+              onChange={(p) => set("proprietario_comp_renda_url", p)}
+            />
+          </section>
+
+          {/* LOCATÁRIO */}
+          <section className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
+            <BlocoTitulo>Locatário</BlocoTitulo>
+            <div className="sm:col-span-2">
+              <CampoSelect
+                campo="locatario_tipo_pessoa"
+                label="Tipo de pessoa"
+                opcoes={[
+                  { value: "fisica", label: "Pessoa física" },
+                  { value: "juridica", label: "Pessoa jurídica" },
+                ]}
+              />
             </div>
-          </div>
 
-          <div className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:col-span-2 sm:grid-cols-2">
-            <p className="text-muted-foreground text-xs font-semibold uppercase tracking-[0.18em] sm:col-span-2">
-              Dados do imóvel
-            </p>
-            <div className="space-y-1.5">
-              <Label htmlFor="loc-endereco">Endereço</Label>
+            {!pessoaJuridica ? (
+              <>
+                <CampoTexto campo="locatario" label="Nome" />
+                <CampoSelect
+                  campo="locatario_estado_civil"
+                  label="Estado civil"
+                  opcoes={ESTADO_CIVIL_OPCOES}
+                />
+                <CampoTexto campo="locatario_profissao" label="Profissão" />
+                <CampoTexto campo="locatario_rg" label="RG" />
+                <CampoTexto campo="locatario_orgao_expedidor" label="Órgão expedidor" />
+                <CampoTexto campo="locatario_cpf" label="CPF" />
+                <CampoTexto campo="locatario_email" label="E-mail" tipo="email" />
+                <CampoTexto campo="locatario_celular" label="Celular" modo="tel" />
+                <CampoTexto campo="locatario_contato_referencia" label="Contato de referência" />
+
+                <BlocoTitulo>Documentos do locatário</BlocoTitulo>
+                <DocumentoIdentificacao
+                  campoTipo="locatario_doc_tipo"
+                  campoAnexo="locatario_doc_url"
+                />
+                <LinhaAnexo
+                  nome="Comprovante de residência"
+                  valor={form.locatario_comp_residencia_url}
+                  onChange={(p) => set("locatario_comp_residencia_url", p)}
+                />
+                <LinhaAnexo
+                  nome="Comprovante de renda"
+                  valor={form.locatario_comp_renda_url}
+                  onChange={(p) => set("locatario_comp_renda_url", p)}
+                />
+              </>
+            ) : (
+              <>
+                <CampoTexto campo="empresa_nome" label="Empresa" />
+                <CampoTexto campo="empresa_cnpj" label="CNPJ" />
+                <CampoTexto campo="empresa_insc_estadual" label="Insc. estadual" />
+                <CampoTexto campo="empresa_endereco" label="Endereço" />
+                <CampoTexto campo="empresa_bairro" label="Bairro" />
+                <CampoTexto campo="empresa_cidade" label="Cidade" />
+                <CampoTexto campo="empresa_estado" label="Estado" />
+
+                <BlocoTitulo>Documentos da empresa</BlocoTitulo>
+                <LinhaAnexo
+                  nome="Cartão CNPJ"
+                  valor={form.empresa_cartao_cnpj_url}
+                  onChange={(p) => set("empresa_cartao_cnpj_url", p)}
+                />
+                <LinhaAnexo
+                  nome="Comprovante de residência"
+                  valor={form.empresa_comp_residencia_url}
+                  onChange={(p) => set("empresa_comp_residencia_url", p)}
+                />
+                <LinhaAnexo
+                  nome="Outros"
+                  valor={form.empresa_outros_doc_url}
+                  onChange={(p) => set("empresa_outros_doc_url", p)}
+                />
+
+                <BlocoTitulo>Responsável da empresa</BlocoTitulo>
+                <CampoTexto campo="resp_nome" label="Nome do responsável" />
+                <CampoSelect
+                  campo="resp_estado_civil"
+                  label="Estado civil"
+                  opcoes={ESTADO_CIVIL_OPCOES}
+                />
+                <CampoTexto campo="resp_profissao" label="Profissão" />
+                <CampoTexto campo="resp_rg" label="RG" />
+                <CampoTexto campo="resp_orgao_expedidor" label="Órgão expedidor" />
+                <CampoTexto campo="resp_cpf" label="CPF" />
+                <CampoTexto campo="resp_email" label="E-mail" tipo="email" />
+                <CampoTexto campo="resp_celular" label="Celular" modo="tel" />
+                <CampoTexto campo="resp_contato_referencia" label="Contato de referência" />
+
+                <BlocoTitulo>Documentos do responsável</BlocoTitulo>
+                <DocumentoIdentificacao campoTipo="resp_doc_tipo" campoAnexo="resp_doc_url" />
+                <LinhaAnexo
+                  nome="Comprovante de residência"
+                  valor={form.resp_comp_residencia_url}
+                  onChange={(p) => set("resp_comp_residencia_url", p)}
+                />
+                <LinhaAnexo
+                  nome="Comprovante de renda"
+                  valor={form.resp_comp_renda_url}
+                  onChange={(p) => set("resp_comp_renda_url", p)}
+                />
+              </>
+            )}
+          </section>
+
+          {/* DADOS DO IMÓVEL */}
+          <section className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
+            <BlocoTitulo>Dados do imóvel</BlocoTitulo>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="loc-endereco">Endereço (rua, quadra/lote)</Label>
               <Input
                 id="loc-endereco"
                 value={form.endereco}
                 onChange={(e) => set("endereco", e.target.value)}
+                placeholder="Ex.: Rua 12, Quadra 8, Lote 15"
                 required
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="loc-numero">Número</Label>
-              <Input
-                id="loc-numero"
-                value={form.numero_casa}
-                onChange={(e) => set("numero_casa", e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="loc-bairro">Bairro</Label>
-              <Input
-                id="loc-bairro"
-                value={form.bairro}
-                onChange={(e) => set("bairro", e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="loc-cep">CEP</Label>
-              <Input
-                id="loc-cep"
-                value={form.cep}
-                onChange={(e) => set("cep", formatarCep(e.target.value))}
-                placeholder="00000-000"
-                inputMode="numeric"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="loc-cidade">Cidade</Label>
-              <Input
-                id="loc-cidade"
-                value={form.cidade}
-                onChange={(e) => set("cidade", e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Estado (UF)</Label>
-              <Select value={form.estado} onValueChange={(v) => set("estado", v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="UF" />
-                </SelectTrigger>
-                <SelectContent>
-                  {ESTADOS_UF.map((uf) => (
-                    <SelectItem key={uf} value={uf}>
-                      {uf}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <CampoSelect
+              campo="bairro"
+              label="Bairro"
+              opcoes={BAIRROS.map((b) => ({ value: b, label: b }))}
+            />
+            <CampoSelect
+              campo="tipo_locacao"
+              label="Tipo de residência"
+              opcoes={[
+                { value: "residencial", label: "Residencial" },
+                { value: "comercial", label: "Comercial" },
+              ]}
+            />
             <div className="space-y-1.5 sm:col-span-2">
               <Label htmlFor="loc-descricao">Descrição do imóvel</Label>
               <Textarea
@@ -511,106 +650,70 @@ export function LocacaoDialog({
                 onChange={(e) => set("descricao_imovel", e.target.value)}
               />
             </div>
-          </div>
 
-          <div className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:col-span-2 sm:grid-cols-2">
-            <p className="text-muted-foreground text-xs font-semibold uppercase tracking-[0.18em] sm:col-span-2">
-              Dados da negociação
-            </p>
-            <div className="space-y-1.5">
-              <Label>Tipo de locação</Label>
-              <Select value={form.tipo_locacao} onValueChange={(v) => set("tipo_locacao", v)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="residencial">Residencial</SelectItem>
-                  <SelectItem value="comercial">Comercial</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="loc-prazo">Prazo</Label>
-              <Input
-                id="loc-prazo"
-                value={form.prazo}
-                onChange={(e) => set("prazo", e.target.value)}
-                placeholder="Ex.: 12 meses"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="loc-inicio">Início</Label>
-              <Input
-                id="loc-inicio"
-                type="date"
-                value={form.inicio_contrato}
-                onChange={(e) => set("inicio_contrato", e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="loc-valor">Valor do aluguel (R$)</Label>
-              <Input
-                id="loc-valor"
-                value={form.valor_aluguel}
-                onChange={(e) => set("valor_aluguel", e.target.value)}
-                inputMode="decimal"
-                placeholder="1500"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Vencimento</Label>
-              <Select value={form.vencimento_dia} onValueChange={(v) => set("vencimento_dia", v)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="4">Dia 04</SelectItem>
-                  <SelectItem value="10">Dia 10</SelectItem>
-                  <SelectItem value="20">Dia 20</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Administração</Label>
-              <Select value={form.administracao} onValueChange={(v) => set("administracao", v)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="sim">Sim</SelectItem>
-                  <SelectItem value="nao">Não</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:col-span-2">
-            <Label>Status da vistoria</Label>
-            <Select value={form.status_vistoria} onValueChange={(v) => set("status_vistoria", v)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(STATUS_VISTORIA_LABEL).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="loc-obs">Histórico e observações</Label>
-            <Textarea
-              id="loc-obs"
-              rows={6}
-              value={form.observacoes}
-              onChange={(e) => set("observacoes", e.target.value)}
-              placeholder="Registre movimentações, pendências e próximos passos."
+            <BlocoTitulo>Documentos do imóvel</BlocoTitulo>
+            <LinhaAnexo
+              nome="Conta de energia"
+              valor={form.imovel_conta_energia_url}
+              onChange={(p) => set("imovel_conta_energia_url", p)}
             />
-          </div>
+            <LinhaAnexo
+              nome="Conta de água"
+              valor={form.imovel_conta_agua_url}
+              onChange={(p) => set("imovel_conta_agua_url", p)}
+            />
+            <LinhaAnexo
+              nome="Outros"
+              valor={form.imovel_outros_doc_url}
+              onChange={(p) => set("imovel_outros_doc_url", p)}
+            />
+          </section>
 
-          <DialogFooter className="gap-2 sm:col-span-2">
+          {/* DADOS DA NEGOCIAÇÃO */}
+          <section className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
+            <BlocoTitulo>Dados da negociação</BlocoTitulo>
+            <CampoSelect
+              campo="administracao"
+              label="Com administração"
+              opcoes={[
+                { value: "sim", label: "Sim" },
+                { value: "nao", label: "Não" },
+              ]}
+            />
+            <CampoTexto campo="valor_aluguel" label="Valor do aluguel (R$)" modo="decimal" />
+            <CampoSelect
+              campo="garantia_caucao"
+              label="Garantia caução"
+              opcoes={[
+                { value: "sim", label: "Sim" },
+                { value: "nao", label: "Não" },
+              ]}
+            />
+            <CampoTexto campo="valor_caucao" label="Valor da caução (R$)" modo="decimal" />
+            <CampoTexto campo="prazo" label="Duração" />
+            <CampoTexto campo="inicio_contrato" label="Data do início" tipo="date" />
+            <CampoTexto campo="data_pagamento" label="Data do pagamento" tipo="date" />
+            <CampoSelect
+              campo="status_vistoria"
+              label="Status da vistoria"
+              opcoes={Object.entries(STATUS_VISTORIA_LABEL).map(([value, label]) => ({
+                value,
+                label,
+              }))}
+            />
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="loc-obs">Observações</Label>
+              <Textarea
+                id="loc-obs"
+                rows={6}
+                value={form.observacoes}
+                onChange={(e) => set("observacoes", e.target.value)}
+                placeholder="Registre movimentações, pendências e próximos passos."
+              />
+            </div>
+          </section>
+
+          <DialogFooter className="gap-2">
             <Button
               type="button"
               variant="ghost"
