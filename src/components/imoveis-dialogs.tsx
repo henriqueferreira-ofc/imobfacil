@@ -230,9 +230,11 @@ function LinhaAnexo({
 
 function BlocoTitulo({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-muted-foreground text-xs font-semibold tracking-[0.18em] uppercase sm:col-span-2">
-      {children}
-    </p>
+    <div className="sm:col-span-2">
+      <p className="rounded-lg border border-primary/20 bg-primary/10 px-3 py-2 text-sm font-extrabold uppercase text-primary shadow-sm">
+        {children}
+      </p>
+    </div>
   );
 }
 
@@ -593,7 +595,7 @@ export function LocacaoDialog({
                   onChange={(p) => set("empresa_outros_doc_url", p)}
                 />
 
-                <BlocoTitulo>Responsável da empresa</BlocoTitulo>
+                <BlocoTitulo>Responsável pela empresa</BlocoTitulo>
                 <CampoTexto campo="resp_nome" label="Nome do responsável" />
                 <CampoSelect
                   campo="resp_estado_civil"
