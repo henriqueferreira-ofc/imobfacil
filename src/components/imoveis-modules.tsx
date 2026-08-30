@@ -364,7 +364,7 @@ export function AdministracaoModule() {
         { label: "Repasse previsto", valor: formatarMoeda(totalRepasse) },
         {
           label: "Manutenções abertas",
-          valor: lista.filter((i) => i.manutencao_aberta.trim().length > 0).length,
+          valor: lista.filter((i) => (i.manutencao_aberta ?? "").trim().length > 0).length,
         },
         { label: "Concluídos", valor: lista.filter((i) => i.status === "concluido").length },
       ]}

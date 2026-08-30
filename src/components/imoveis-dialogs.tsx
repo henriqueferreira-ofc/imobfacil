@@ -22,8 +22,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { ESTADOS_UF, formatarCep } from "@/lib/protocolos";
-import { STATUS_VISTORIA_LABEL, type ImovelAdministrado, type Locacao } from "@/lib/imoveis";
+import { BAIRROS, ESTADOS_UF, formatarCep } from "@/lib/protocolos";
+import {
+  ESTADO_CIVIL_OPCOES,
+  STATUS_VISTORIA_LABEL,
+  type ImovelAdministrado,
+  type Locacao,
+} from "@/lib/imoveis";
 
 const CAMPOS_LOCACAO_TEXTO = [
   "endereco",
@@ -195,7 +200,11 @@ function AnexoBotao({
           onClick={() => inputRef.current?.click()}
           title={`Anexar ${label}`}
         >
-          {enviando ? <Loader2 className="size-4 animate-spin" /> : <Paperclip className="size-4" />}
+          {enviando ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Paperclip className="size-4" />
+          )}
         </Button>
       )}
     </div>
