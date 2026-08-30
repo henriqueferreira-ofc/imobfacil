@@ -6,8 +6,59 @@ export const STATUS_VISTORIA_LABEL: Record<string, string> = {
   concluido: "Concluído",
 };
 
+export const ESTADO_CIVIL_OPCOES = [
+  { value: "casado", label: "Casado" },
+  { value: "solteiro", label: "Solteiro" },
+  { value: "uniao_estavel", label: "União Estável" },
+];
+
 export interface Locacao {
   id: string;
+  proprietario_profissao: string;
+  proprietario_estado_civil: string;
+  proprietario_rg: string;
+  proprietario_orgao_expedidor: string;
+  proprietario_cpf: string;
+  proprietario_contato_referencia: string;
+  proprietario_doc_tipo: string;
+  proprietario_comp_residencia_url: string;
+  proprietario_comp_renda_url: string;
+  locatario_rg: string;
+  locatario_orgao_expedidor: string;
+  locatario_cpf: string;
+  locatario_contato_referencia: string;
+  locatario_doc_tipo: string;
+  locatario_comp_residencia_url: string;
+  locatario_comp_renda_url: string;
+  empresa_nome: string;
+  empresa_cnpj: string;
+  empresa_insc_estadual: string;
+  empresa_endereco: string;
+  empresa_bairro: string;
+  empresa_cidade: string;
+  empresa_estado: string;
+  empresa_cartao_cnpj_url: string;
+  empresa_comp_residencia_url: string;
+  empresa_outros_doc_url: string;
+  resp_nome: string;
+  resp_estado_civil: string;
+  resp_profissao: string;
+  resp_rg: string;
+  resp_orgao_expedidor: string;
+  resp_cpf: string;
+  resp_email: string;
+  resp_celular: string;
+  resp_contato_referencia: string;
+  resp_doc_tipo: string;
+  resp_doc_url: string;
+  resp_comp_residencia_url: string;
+  resp_comp_renda_url: string;
+  imovel_conta_energia_url: string;
+  imovel_conta_agua_url: string;
+  imovel_outros_doc_url: string;
+  garantia_caucao: boolean;
+  valor_caucao: number;
+  data_pagamento: string | null;
   codigo: string;
   imovel: string;
   endereco: string;
