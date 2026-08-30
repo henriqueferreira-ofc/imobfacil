@@ -384,17 +384,12 @@ export function LocacaoDialog({
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function CampoTexto({
-    campo,
-    label,
-    tipo,
-    modo,
-  }: {
-    campo: LocacaoCampo;
-    label: string;
-    tipo?: string;
-    modo?: "tel" | "numeric" | "decimal" | "email";
-  }) {
+  function campoTexto(
+    campo: LocacaoCampo,
+    label: string,
+    tipo?: string,
+    modo?: "tel" | "numeric" | "decimal" | "email",
+  ) {
     return (
       <div className="space-y-1.5">
         <Label htmlFor={`loc-${campo}`}>{label}</Label>
@@ -475,19 +470,19 @@ export function LocacaoDialog({
           {/* LOCADOR */}
           <section className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
             <BlocoTitulo>Locador</BlocoTitulo>
-            <CampoTexto campo="proprietario" label="Nome" />
-            <CampoTexto campo="proprietario_profissao" label="Profissão" />
+            {campoTexto("proprietario", "Nome")}
+            {campoTexto("proprietario_profissao", "Profissão")}
             <CampoSelect
               campo="proprietario_estado_civil"
               label="Estado civil"
               opcoes={ESTADO_CIVIL_OPCOES}
             />
-            <CampoTexto campo="proprietario_rg" label="RG" />
-            <CampoTexto campo="proprietario_orgao_expedidor" label="Órgão expedidor" />
-            <CampoTexto campo="proprietario_cpf" label="CPF" />
-            <CampoTexto campo="proprietario_email" label="E-mail" tipo="email" />
-            <CampoTexto campo="proprietario_celular" label="Celular" modo="tel" />
-            <CampoTexto campo="proprietario_contato_referencia" label="Contato de referência" />
+            {campoTexto("proprietario_rg", "RG")}
+            {campoTexto("proprietario_orgao_expedidor", "Órgão expedidor")}
+            {campoTexto("proprietario_cpf", "CPF")}
+            {campoTexto("proprietario_email", "E-mail", "email")}
+            {campoTexto("proprietario_celular", "Celular", undefined, "tel")}
+            {campoTexto("proprietario_contato_referencia", "Contato de referência")}
 
             <BlocoTitulo>Documentos do locador</BlocoTitulo>
             <DocumentoIdentificacao campoAnexo="proprietario_doc_url" />
@@ -519,19 +514,19 @@ export function LocacaoDialog({
 
             {!pessoaJuridica ? (
               <>
-                <CampoTexto campo="locatario" label="Nome" />
+                {campoTexto("locatario", "Nome")}
                 <CampoSelect
                   campo="locatario_estado_civil"
                   label="Estado civil"
                   opcoes={ESTADO_CIVIL_OPCOES}
                 />
-                <CampoTexto campo="locatario_profissao" label="Profissão" />
-                <CampoTexto campo="locatario_rg" label="RG" />
-                <CampoTexto campo="locatario_orgao_expedidor" label="Órgão expedidor" />
-                <CampoTexto campo="locatario_cpf" label="CPF" />
-                <CampoTexto campo="locatario_email" label="E-mail" tipo="email" />
-                <CampoTexto campo="locatario_celular" label="Celular" modo="tel" />
-                <CampoTexto campo="locatario_contato_referencia" label="Contato de referência" />
+                {campoTexto("locatario_profissao", "Profissão")}
+                {campoTexto("locatario_rg", "RG")}
+                {campoTexto("locatario_orgao_expedidor", "Órgão expedidor")}
+                {campoTexto("locatario_cpf", "CPF")}
+                {campoTexto("locatario_email", "E-mail", "email")}
+                {campoTexto("locatario_celular", "Celular", undefined, "tel")}
+                {campoTexto("locatario_contato_referencia", "Contato de referência")}
 
                 <BlocoTitulo>Documentos do locatário</BlocoTitulo>
                 <DocumentoIdentificacao campoAnexo="locatario_doc_url" />
@@ -548,13 +543,13 @@ export function LocacaoDialog({
               </>
             ) : (
               <>
-                <CampoTexto campo="empresa_nome" label="Empresa" />
-                <CampoTexto campo="empresa_cnpj" label="CNPJ" />
-                <CampoTexto campo="empresa_insc_estadual" label="Insc. estadual" />
-                <CampoTexto campo="empresa_endereco" label="Endereço" />
-                <CampoTexto campo="empresa_bairro" label="Bairro" />
-                <CampoTexto campo="empresa_cidade" label="Cidade" />
-                <CampoTexto campo="empresa_estado" label="Estado" />
+                {campoTexto("empresa_nome", "Empresa")}
+                {campoTexto("empresa_cnpj", "CNPJ")}
+                {campoTexto("empresa_insc_estadual", "Insc. estadual")}
+                {campoTexto("empresa_endereco", "Endereço")}
+                {campoTexto("empresa_bairro", "Bairro")}
+                {campoTexto("empresa_cidade", "Cidade")}
+                {campoTexto("empresa_estado", "Estado")}
 
                 <BlocoTitulo>Documentos da empresa</BlocoTitulo>
                 <LinhaAnexo
@@ -574,19 +569,19 @@ export function LocacaoDialog({
                 />
 
                 <BlocoTitulo>Responsável pela empresa</BlocoTitulo>
-                <CampoTexto campo="resp_nome" label="Nome do responsável" />
+                {campoTexto("resp_nome", "Nome do responsável")}
                 <CampoSelect
                   campo="resp_estado_civil"
                   label="Estado civil"
                   opcoes={ESTADO_CIVIL_OPCOES}
                 />
-                <CampoTexto campo="resp_profissao" label="Profissão" />
-                <CampoTexto campo="resp_rg" label="RG" />
-                <CampoTexto campo="resp_orgao_expedidor" label="Órgão expedidor" />
-                <CampoTexto campo="resp_cpf" label="CPF" />
-                <CampoTexto campo="resp_email" label="E-mail" tipo="email" />
-                <CampoTexto campo="resp_celular" label="Celular" modo="tel" />
-                <CampoTexto campo="resp_contato_referencia" label="Contato de referência" />
+                {campoTexto("resp_profissao", "Profissão")}
+                {campoTexto("resp_rg", "RG")}
+                {campoTexto("resp_orgao_expedidor", "Órgão expedidor")}
+                {campoTexto("resp_cpf", "CPF")}
+                {campoTexto("resp_email", "E-mail", "email")}
+                {campoTexto("resp_celular", "Celular", undefined, "tel")}
+                {campoTexto("resp_contato_referencia", "Contato de referência")}
 
                 <BlocoTitulo>Documentos do responsável</BlocoTitulo>
                 <DocumentoIdentificacao campoAnexo="resp_doc_url" />
@@ -662,7 +657,7 @@ export function LocacaoDialog({
           <section className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
             <BlocoTitulo>Dados da negociação</BlocoTitulo>
             <div className="space-y-1.5 sm:col-span-2">
-              <CampoTexto campo="corretor" label="Corretor Responsável" />
+              {campoTexto("corretor", "Corretor Responsável")}
             </div>
             <CampoSelect
               campo="administracao"
@@ -672,7 +667,7 @@ export function LocacaoDialog({
                 { value: "nao", label: "Não" },
               ]}
             />
-            <CampoTexto campo="valor_aluguel" label="Valor do aluguel (R$)" modo="decimal" />
+            {campoTexto("valor_aluguel", "Valor do aluguel (R$)", undefined, "decimal")}
             <CampoSelect
               campo="garantia_caucao"
               label="Garantia caução"
@@ -681,10 +676,10 @@ export function LocacaoDialog({
                 { value: "nao", label: "Não" },
               ]}
             />
-            <CampoTexto campo="valor_caucao" label="Valor da caução (R$)" modo="decimal" />
-            <CampoTexto campo="prazo" label="Duração" />
-            <CampoTexto campo="inicio_contrato" label="Data do início" tipo="date" />
-            <CampoTexto campo="data_pagamento" label="Data do pagamento" tipo="date" />
+            {campoTexto("valor_caucao", "Valor da caução (R$)", undefined, "decimal")}
+            {campoTexto("prazo", "Duração")}
+            {campoTexto("inicio_contrato", "Data do início", "date")}
+            {campoTexto("data_pagamento", "Data do pagamento", "date")}
             <CampoSelect
               campo="status_vistoria"
               label="Status da vistoria"
