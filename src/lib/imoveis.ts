@@ -80,6 +80,7 @@ export interface Locacao {
   locatario_doc_url: string;
   descricao_imovel: string;
   tipo_locacao: string;
+  corretor: string;
   prazo: string;
   administracao: boolean;
   valor_aluguel: number;

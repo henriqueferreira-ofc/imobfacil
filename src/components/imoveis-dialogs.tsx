@@ -92,6 +92,7 @@ const CAMPOS_LOCACAO_TEXTO = [
   "imovel_outros_doc_url",
   "descricao_imovel",
   "tipo_locacao",
+  "corretor",
   "prazo",
   "administracao",
   "garantia_caucao",
@@ -292,7 +293,7 @@ export function LocacaoDialog({
         proprietario_email: form.proprietario_email,
         proprietario_celular: form.proprietario_celular,
         proprietario_contato_referencia: form.proprietario_contato_referencia,
-        proprietario_doc_tipo: form.proprietario_doc_tipo,
+        proprietario_doc_tipo: form.proprietario_doc_tipo || "rg",
         proprietario_doc_url: form.proprietario_doc_url,
         proprietario_comp_residencia_url: form.proprietario_comp_residencia_url,
         proprietario_comp_renda_url: form.proprietario_comp_renda_url,
@@ -306,7 +307,7 @@ export function LocacaoDialog({
         locatario_email: form.locatario_email,
         locatario_celular: form.locatario_celular,
         locatario_contato_referencia: form.locatario_contato_referencia,
-        locatario_doc_tipo: form.locatario_doc_tipo,
+        locatario_doc_tipo: form.locatario_doc_tipo || "rg",
         locatario_doc_url: form.locatario_doc_url,
         locatario_comp_residencia_url: form.locatario_comp_residencia_url,
         locatario_comp_renda_url: form.locatario_comp_renda_url,
@@ -329,7 +330,7 @@ export function LocacaoDialog({
         resp_email: form.resp_email,
         resp_celular: form.resp_celular,
         resp_contato_referencia: form.resp_contato_referencia,
-        resp_doc_tipo: form.resp_doc_tipo,
+        resp_doc_tipo: form.resp_doc_tipo || "rg",
         resp_doc_url: form.resp_doc_url,
         resp_comp_residencia_url: form.resp_comp_residencia_url,
         resp_comp_renda_url: form.resp_comp_renda_url,
@@ -338,6 +339,7 @@ export function LocacaoDialog({
         imovel_outros_doc_url: form.imovel_outros_doc_url,
         descricao_imovel: form.descricao_imovel,
         tipo_locacao: form.tipo_locacao,
+        corretor: form.corretor,
         prazo: form.prazo,
         administracao: form.administracao === "sim",
         garantia_caucao: form.garantia_caucao === "sim",
@@ -437,31 +439,13 @@ export function LocacaoDialog({
     );
   }
 
-  function DocumentoIdentificacao({
-    campoTipo,
-    campoAnexo,
-  }: {
-    campoTipo: LocacaoCampo;
-    campoAnexo: LocacaoCampo;
-  }) {
+  function DocumentoIdentificacao({ campoAnexo }: { campoAnexo: LocacaoCampo }) {
     return (
-      <div className="grid gap-2 sm:col-span-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
-        <CampoSelect
-          campo={campoTipo}
-          label="Documento de identificação"
-          opcoes={[
-            { value: "rg", label: "RG" },
-            { value: "cnh", label: "CNH" },
-          ]}
-        />
-        <div className="sm:pb-1">
-          <AnexoBotao
-            label="documento de identificação"
-            valor={form[campoAnexo]}
-            onChange={(path) => set(campoAnexo, path)}
-          />
-        </div>
-      </div>
+      <LinhaAnexo
+        nome="Documento de Identificação"
+        valor={form[campoAnexo]}
+        onChange={(path) => set(campoAnexo, path)}
+      />
     );
   }
 
@@ -506,10 +490,7 @@ export function LocacaoDialog({
             <CampoTexto campo="proprietario_contato_referencia" label="Contato de referência" />
 
             <BlocoTitulo>Documentos do locador</BlocoTitulo>
-            <DocumentoIdentificacao
-              campoTipo="proprietario_doc_tipo"
-              campoAnexo="proprietario_doc_url"
-            />
+            <DocumentoIdentificacao campoAnexo="proprietario_doc_url" />
             <LinhaAnexo
               nome="Comprovante de residência"
               valor={form.proprietario_comp_residencia_url}
@@ -553,10 +534,7 @@ export function LocacaoDialog({
                 <CampoTexto campo="locatario_contato_referencia" label="Contato de referência" />
 
                 <BlocoTitulo>Documentos do locatário</BlocoTitulo>
-                <DocumentoIdentificacao
-                  campoTipo="locatario_doc_tipo"
-                  campoAnexo="locatario_doc_url"
-                />
+                <DocumentoIdentificacao campoAnexo="locatario_doc_url" />
                 <LinhaAnexo
                   nome="Comprovante de residência"
                   valor={form.locatario_comp_residencia_url}
@@ -611,7 +589,7 @@ export function LocacaoDialog({
                 <CampoTexto campo="resp_contato_referencia" label="Contato de referência" />
 
                 <BlocoTitulo>Documentos do responsável</BlocoTitulo>
-                <DocumentoIdentificacao campoTipo="resp_doc_tipo" campoAnexo="resp_doc_url" />
+                <DocumentoIdentificacao campoAnexo="resp_doc_url" />
                 <LinhaAnexo
                   nome="Comprovante de residência"
                   valor={form.resp_comp_residencia_url}
@@ -683,6 +661,9 @@ export function LocacaoDialog({
           {/* DADOS DA NEGOCIAÇÃO */}
           <section className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
             <BlocoTitulo>Dados da negociação</BlocoTitulo>
+            <div className="space-y-1.5 sm:col-span-2">
+              <CampoTexto campo="corretor" label="Corretor Responsável" />
+            </div>
             <CampoSelect
               campo="administracao"
               label="Com administração"

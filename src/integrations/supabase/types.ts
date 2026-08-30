@@ -69,6 +69,7 @@ export type Database = {
           cep: string
           cidade: string
           codigo: string
+          corretor: string
           created_at: string
           created_by: string | null
           data_pagamento: string | null
@@ -149,6 +150,7 @@ export type Database = {
           cep?: string
           cidade?: string
           codigo?: string
+          corretor?: string
           created_at?: string
           created_by?: string | null
           data_pagamento?: string | null
@@ -229,6 +231,7 @@ export type Database = {
           cep?: string
           cidade?: string
           codigo?: string
+          corretor?: string
           created_at?: string
           created_by?: string | null
           data_pagamento?: string | null
