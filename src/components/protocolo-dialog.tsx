@@ -171,6 +171,16 @@ function AnexoDocumento({
   );
 }
 
+function BlocoTitulo({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="sm:col-span-2">
+      <p className="rounded-lg border border-primary/20 bg-primary/10 px-3 py-2 text-sm font-extrabold uppercase text-primary shadow-sm">
+        {children}
+      </p>
+    </div>
+  );
+}
+
 export function ProtocoloDialog({
   open,
   onOpenChange,
@@ -238,156 +248,70 @@ export function ProtocoloDialog({
         </DialogHeader>
 
         <form
-          className="grid gap-4 sm:grid-cols-2"
+          className="grid gap-4"
           onSubmit={(e) => {
             e.preventDefault();
             salvar.mutate();
           }}
         >
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="vendedores">Vendedor(es)</Label>
-            <Input
-              id="vendedores"
-              value={form.vendedores}
-              onChange={(e) => set("vendedores", e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="compradores">Comprador(es)</Label>
-            <Input
-              id="compradores"
-              value={form.compradores}
-              onChange={(e) => set("compradores", e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="corretor">Corretor responsável</Label>
-            <Input
-              id="corretor"
-              value={form.corretor}
-              onChange={(e) => set("corretor", e.target.value)}
-            />
-          </div>
-
-          <div className="sm:col-span-2">
-            <p className="text-eyebrow text-muted-foreground">Endereço do imóvel</p>
-          </div>
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="endereco">Endereço (rua/avenida)</Label>
-            <Input
-              id="endereco"
-              value={form.endereco}
-              onChange={(e) => set("endereco", e.target.value)}
-            />
-          </div>
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label>Bairro</Label>
-            <Select value={form.bairro} onValueChange={(v) => set("bairro", v)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o bairro" />
-              </SelectTrigger>
-              <SelectContent>
-                {BAIRROS.map((b) => (
-                  <SelectItem key={b} value={b}>
-                    {b}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="sm:col-span-2">
-            <p className="text-eyebrow text-muted-foreground">Documentos</p>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="matricula">Matrícula</Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="matricula"
-                value={form.matricula}
-                onChange={(e) => set("matricula", e.target.value)}
-              />
-              <AnexoDocumento
-                label="Matrícula"
-                valor={form.matricula_doc_url}
-                onChange={(p) => setAnexo("matricula_doc_url", p)}
-              />
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="cif">CIF</Label>
-            <div className="flex items-center gap-2">
-              <Input id="cif" value={form.cif} onChange={(e) => set("cif", e.target.value)} />
-              <AnexoDocumento
-                label="CIF"
-                valor={form.cif_doc_url}
-                onChange={(p) => setAnexo("cif_doc_url", p)}
-              />
-            </div>
-          </div>
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="contrato">Contrato</Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="contrato"
-                value={form.contrato}
-                onChange={(e) => set("contrato", e.target.value)}
-              />
-              <AnexoDocumento
-                label="Contrato"
-                valor={form.contrato_doc_url}
-                onChange={(p) => setAnexo("contrato_doc_url", p)}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label>Tipo de imóvel</Label>
-            <Select
-              value={form.tipo_imovel}
-              onValueChange={(v) => set("tipo_imovel", v as FormState["tipo_imovel"])}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(TIPO_IMOVEL_LABEL).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label>Tipo de negociação</Label>
-            <Select
-              value={form.tipo_negociacao}
-              onValueChange={(v) => set("tipo_negociacao", v as FormState["tipo_negociacao"])}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(TIPO_NEGOCIACAO_LABEL).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          {form.tipo_negociacao === "financiamento" && (
+          <section className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
+            <BlocoTitulo>Vendedor(es)</BlocoTitulo>
             <div className="space-y-1.5 sm:col-span-2">
-              <Label>Banco</Label>
-              <Select value={form.banco} onValueChange={(v) => set("banco", v)}>
+              <Label htmlFor="vendedores" className="sr-only">
+                Vendedor(es)
+              </Label>
+              <Input
+                id="vendedores"
+                value={form.vendedores}
+                onChange={(e) => set("vendedores", e.target.value)}
+                required
+              />
+            </div>
+
+            <BlocoTitulo>Comprador(es)</BlocoTitulo>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="compradores" className="sr-only">
+                Comprador(es)
+              </Label>
+              <Input
+                id="compradores"
+                value={form.compradores}
+                onChange={(e) => set("compradores", e.target.value)}
+                required
+              />
+            </div>
+
+            <BlocoTitulo>Corretor responsável</BlocoTitulo>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="corretor" className="sr-only">
+                Corretor responsável
+              </Label>
+              <Input
+                id="corretor"
+                value={form.corretor}
+                onChange={(e) => set("corretor", e.target.value)}
+              />
+            </div>
+          </section>
+
+          <section className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
+            <BlocoTitulo>Endereço do imóvel</BlocoTitulo>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="endereco">Endereço (rua/avenida)</Label>
+              <Input
+                id="endereco"
+                value={form.endereco}
+                onChange={(e) => set("endereco", e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label>Bairro</Label>
+              <Select value={form.bairro} onValueChange={(v) => set("bairro", v)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione o banco" />
+                  <SelectValue placeholder="Selecione o bairro" />
                 </SelectTrigger>
                 <SelectContent>
-                  {BANCOS.map((b) => (
+                  {BAIRROS.map((b) => (
                     <SelectItem key={b} value={b}>
                       {b}
                     </SelectItem>
@@ -395,41 +319,144 @@ export function ProtocoloDialog({
                 </SelectContent>
               </Select>
             </div>
-          )}
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label>Status</Label>
-            <Select
-              value={form.status}
-              onValueChange={(v) => set("status", v as FormState["status"])}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(STATUS_LABEL).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          </section>
 
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="historico">Histórico</Label>
-            <Textarea
-              id="historico"
-              rows={7}
-              value={form.historico}
-              onChange={(e) => set("historico", e.target.value)}
-              placeholder={"25/08/2026 - Proposta aceita.\n26/08/2026 - Documentos enviados."}
-            />
-            <p className="text-xs text-muted-foreground">
-              Uma linha por andamento — cada linha aparece como um item da linha do tempo.
-            </p>
-          </div>
+          <section className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
+            <BlocoTitulo>Documentos</BlocoTitulo>
+            <div className="space-y-1.5">
+              <Label htmlFor="matricula">Matrícula</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="matricula"
+                  value={form.matricula}
+                  onChange={(e) => set("matricula", e.target.value)}
+                />
+                <AnexoDocumento
+                  label="Matrícula"
+                  valor={form.matricula_doc_url}
+                  onChange={(p) => setAnexo("matricula_doc_url", p)}
+                />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="cif">CIF</Label>
+              <div className="flex items-center gap-2">
+                <Input id="cif" value={form.cif} onChange={(e) => set("cif", e.target.value)} />
+                <AnexoDocumento
+                  label="CIF"
+                  valor={form.cif_doc_url}
+                  onChange={(p) => setAnexo("cif_doc_url", p)}
+                />
+              </div>
+            </div>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="contrato">Contrato</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="contrato"
+                  value={form.contrato}
+                  onChange={(e) => set("contrato", e.target.value)}
+                />
+                <AnexoDocumento
+                  label="Contrato"
+                  valor={form.contrato_doc_url}
+                  onChange={(p) => setAnexo("contrato_doc_url", p)}
+                />
+              </div>
+            </div>
 
-          <DialogFooter className="gap-2 sm:col-span-2">
+            <div className="space-y-1.5">
+              <Label>Tipo de imóvel</Label>
+              <Select
+                value={form.tipo_imovel}
+                onValueChange={(v) => set("tipo_imovel", v as FormState["tipo_imovel"])}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(TIPO_IMOVEL_LABEL).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Tipo de negociação</Label>
+              <Select
+                value={form.tipo_negociacao}
+                onValueChange={(v) => set("tipo_negociacao", v as FormState["tipo_negociacao"])}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(TIPO_NEGOCIACAO_LABEL).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {form.tipo_negociacao === "financiamento" && (
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>Banco</Label>
+                <Select value={form.banco} onValueChange={(v) => set("banco", v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o banco" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {BANCOS.map((b) => (
+                      <SelectItem key={b} value={b}>
+                        {b}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </section>
+
+          <section className="bg-muted/40 grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
+            <BlocoTitulo>Status e histórico</BlocoTitulo>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label>Status</Label>
+              <Select
+                value={form.status}
+                onValueChange={(v) => set("status", v as FormState["status"])}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(STATUS_LABEL).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="historico">Histórico</Label>
+              <Textarea
+                id="historico"
+                rows={7}
+                value={form.historico}
+                onChange={(e) => set("historico", e.target.value)}
+                placeholder={"25/08/2026 - Proposta aceita.\n26/08/2026 - Documentos enviados."}
+              />
+              <p className="text-xs text-muted-foreground">
+                Uma linha por andamento — cada linha aparece como um item da linha do tempo.
+              </p>
+            </div>
+          </section>
+
+          <DialogFooter className="gap-2">
             <Button
               type="button"
               variant="ghost"
