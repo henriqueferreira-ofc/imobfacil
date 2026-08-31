@@ -202,14 +202,6 @@ function valoresUnicos(registros: Locacao[], campo: keyof Locacao) {
   ).sort((a, b) => a.localeCompare(b, "pt-BR"));
 }
 
-function erroColunaCorretor(error: unknown) {
-  return error instanceof Error && /corretor|schema cache|column/i.test(error.message);
-}
-
-function semCorretor<T extends { corretor?: string }>(payload: T) {
-  const { corretor: _corretor, ...restante } = payload;
-  return restante;
-}
 
 function AnexoBotao({
   valor,
