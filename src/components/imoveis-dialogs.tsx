@@ -202,14 +202,6 @@ function valoresUnicos(registros: Locacao[], campo: keyof Locacao) {
   ).sort((a, b) => a.localeCompare(b, "pt-BR"));
 }
 
-function erroColunaCorretor(error: unknown) {
-  return error instanceof Error && /corretor|schema cache|column/i.test(error.message);
-}
-
-function semCorretor<T extends { corretor?: string }>(payload: T) {
-  const { corretor: _corretor, ...restante } = payload;
-  return restante;
-}
 
 function AnexoBotao({
   valor,
@@ -463,22 +455,11 @@ export function LocacaoDialog({
       }
       if (registro) {
         const { error } = await supabase.from("locacoes").update(payload).eq("id", registro.id);
-        if (error) {
-          if (!erroColunaCorretor(error)) throw error;
-          const { error: retryError } = await supabase
-            .from("locacoes")
-            .update(semCorretor(payload))
-            .eq("id", registro.id);
-          if (retryError) throw retryError;
-        }
+        if (error) throw error;
         return undefined;
       }
       const { error } = await supabase.from("locacoes").insert(payload);
-      if (error) {
-        if (!erroColunaCorretor(error)) throw error;
-        const { error: retryError } = await supabase.from("locacoes").insert(semCorretor(payload));
-        if (retryError) throw retryError;
-      }
+      if (error) throw error;
       return undefined;
     },
     onSuccess: (codigo) => {
