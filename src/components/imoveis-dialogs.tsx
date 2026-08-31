@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import { BAIRROS, ESTADOS_UF, formatarCep } from "@/lib/protocolos";
 import {
   ESTADO_CIVIL_OPCOES,
@@ -99,6 +100,7 @@ const CAMPOS_LOCACAO_TEXTO = [
   "valor_aluguel",
   "valor_caucao",
   "inicio_contrato",
+  "vencimento_dia",
   "data_pagamento",
   "status_vistoria",
   "observacoes",
@@ -117,6 +119,7 @@ locacaoVazia.tipo_locacao = "residencial";
 locacaoVazia.administracao = "nao";
 locacaoVazia.garantia_caucao = "nao";
 locacaoVazia.status_vistoria = "em_analise";
+locacaoVazia.vencimento_dia = "10";
 locacaoVazia.proprietario_doc_tipo = "rg";
 locacaoVazia.locatario_doc_tipo = "rg";
 locacaoVazia.resp_doc_tipo = "rg";
@@ -202,6 +205,37 @@ function valoresUnicos(registros: Locacao[], campo: keyof Locacao) {
   ).sort((a, b) => a.localeCompare(b, "pt-BR"));
 }
 
+function formatarMoedaInput(valor: string) {
+  const digitos = valor.replace(/\D/g, "");
+  if (!digitos) return "";
+  const numero = Number(digitos) / 100;
+  return numero.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+function moedaInputParaNumero(valor: string) {
+  if (!valor) return 0;
+  return Number(valor.replace(/\./g, "").replace(",", ".")) || 0;
+}
+
+function erroColunaCorretor(error: unknown) {
+  return error instanceof Error && /corretor|schema cache|column/i.test(error.message);
+}
+
+function semCorretor<T extends { corretor?: string }>(payload: T) {
+  const { corretor: _corretor, ...restante } = payload;
+  return restante;
+}
+
+function removerVazios<T extends Record<string, unknown>>(payload: T) {
+  return Object.fromEntries(
+    Object.entries(payload).filter(
+      ([, valor]) => !(typeof valor === "string" && valor === "") && valor !== null,
+    ),
+  );
+}
 
 function AnexoBotao({
   valor,
@@ -364,6 +398,8 @@ export function LocacaoDialog({
       if (valor === null || valor === undefined) continue;
       if (typeof valor === "boolean") {
         proximo[campo] = valor ? "sim" : "nao";
+      } else if (campo === "valor_aluguel" || campo === "valor_caucao") {
+        proximo[campo] = formatarMoedaInput(String(Math.round(Number(valor || 0) * 100)));
       } else {
         proximo[campo] = String(valor);
       }
@@ -439,27 +475,43 @@ export function LocacaoDialog({
         prazo: form.prazo,
         administracao: form.administracao === "sim",
         garantia_caucao: form.garantia_caucao === "sim",
-        valor_aluguel: Number(form.valor_aluguel.replace(",", ".")) || 0,
-        valor_caucao: Number(form.valor_caucao.replace(",", ".")) || 0,
+        valor_aluguel: moedaInputParaNumero(form.valor_aluguel),
+        valor_caucao: moedaInputParaNumero(form.valor_caucao),
         inicio_contrato: form.inicio_contrato || null,
-        data_pagamento: form.data_pagamento || null,
+        vencimento_dia: Number(form.vencimento_dia) || 10,
+        data_pagamento: null,
         status_vistoria: form.status_vistoria || "em_analise",
         observacoes: form.observacoes,
       };
       if (publico) {
+        const payloadPublico = removerVazios(payload);
+        if (!form.valor_aluguel) delete payloadPublico["valor_aluguel"];
+        if (!form.valor_caucao) delete payloadPublico["valor_caucao"];
+
         const { data, error } = await supabase.rpc("cadastrar_locacao_publica", {
-          p_payload: payload,
+          p_payload: payloadPublico as Json,
         });
         if (error) throw error;
         return data as string;
       }
       if (registro) {
         const { error } = await supabase.from("locacoes").update(payload).eq("id", registro.id);
-        if (error) throw error;
+        if (error) {
+          if (!erroColunaCorretor(error)) throw error;
+          const { error: retryError } = await supabase
+            .from("locacoes")
+            .update(semCorretor(payload))
+            .eq("id", registro.id);
+          if (retryError) throw retryError;
+        }
         return undefined;
       }
       const { error } = await supabase.from("locacoes").insert(payload);
-      if (error) throw error;
+      if (error) {
+        if (!erroColunaCorretor(error)) throw error;
+        const { error: retryError } = await supabase.from("locacoes").insert(semCorretor(payload));
+        if (retryError) throw retryError;
+      }
       return undefined;
     },
     onSuccess: (codigo) => {
@@ -493,7 +545,11 @@ export function LocacaoDialog({
       for (const campo of campos) {
         const valor = registroQualquer[campo];
         if (valor === null || valor === undefined) continue;
-        proximo[campo] = typeof valor === "boolean" ? (valor ? "sim" : "nao") : String(valor);
+        if (campo === "valor_aluguel" || campo === "valor_caucao") {
+          proximo[campo] = formatarMoedaInput(String(Math.round(Number(valor || 0) * 100)));
+        } else {
+          proximo[campo] = typeof valor === "boolean" ? (valor ? "sim" : "nao") : String(valor);
+        }
       }
       return proximo;
     });
@@ -524,6 +580,7 @@ export function LocacaoDialog({
       opcoes: string[];
       onEncontrar: (valor: string) => void;
     },
+    formatar?: (valor: string) => string,
   ) {
     const listId = autocomplete ? `loc-${campo}-sugestoes` : undefined;
 
@@ -537,8 +594,9 @@ export function LocacaoDialog({
           inputMode={modo}
           value={form[campo]}
           onChange={(e) => {
-            set(campo, e.target.value);
-            autocomplete?.onEncontrar(e.target.value);
+            const valor = formatar ? formatar(e.target.value) : e.target.value;
+            set(campo, valor);
+            autocomplete?.onEncontrar(valor);
           }}
           onBlur={(e) => autocomplete?.onEncontrar(e.target.value)}
         />
@@ -866,7 +924,14 @@ export function LocacaoDialog({
                 { value: "nao", label: "Não" },
               ]}
             />
-            {campoTexto("valor_aluguel", "Valor do aluguel (R$)", undefined, "decimal")}
+            {campoTexto(
+              "valor_aluguel",
+              "Valor do aluguel (R$)",
+              undefined,
+              "decimal",
+              undefined,
+              formatarMoedaInput,
+            )}
             <CampoSelect
               campo="garantia_caucao"
               label="Garantia caução"
@@ -875,10 +940,25 @@ export function LocacaoDialog({
                 { value: "nao", label: "Não" },
               ]}
             />
-            {campoTexto("valor_caucao", "Valor da caução (R$)", undefined, "decimal")}
+            {campoTexto(
+              "valor_caucao",
+              "Valor da caução (R$)",
+              undefined,
+              "decimal",
+              undefined,
+              formatarMoedaInput,
+            )}
             {campoTexto("prazo", "Duração")}
             {campoTexto("inicio_contrato", "Data do início", "date")}
-            {campoTexto("data_pagamento", "Data do pagamento", "date")}
+            <CampoSelect
+              campo="vencimento_dia"
+              label="Dia de Pagamento"
+              opcoes={[
+                { value: "1", label: "1" },
+                { value: "10", label: "10" },
+                { value: "20", label: "20" },
+              ]}
+            />
             <CampoSelect
               campo="status_vistoria"
               label="Status da vistoria"
