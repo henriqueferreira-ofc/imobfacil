@@ -135,12 +135,28 @@ function ConsultaLocacao() {
               </dl>
             </section>
 
+            {(data.doc_negociacao_nome || data.doc_negociacao_url) && (
+              <section className="shadow-soft rounded-3xl border bg-card p-5 sm:p-8">
+                <h2 className="text-base font-semibold">Documento da negociação</h2>
+                <div className="mt-4 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-sm font-medium">{data.doc_negociacao_nome || "Documento"}</p>
+                  {data.doc_negociacao_url ? (
+                    <Button size="sm" onClick={() => void baixarDocumento(data.doc_negociacao_url)}>
+                      <Download className="size-4" />
+                      Baixar documento
+                    </Button>
+                  ) : null}
+                </div>
+              </section>
+            )}
+
             <section className="shadow-soft rounded-3xl border bg-card p-5 sm:p-8">
               <h2 className="text-base font-semibold">Histórico e observações</h2>
               <p className="mt-3 text-sm whitespace-pre-line text-muted-foreground">
                 {data.observacoes || "Nenhuma observação registrada até o momento."}
               </p>
             </section>
+
           </div>
         )}
       </main>
