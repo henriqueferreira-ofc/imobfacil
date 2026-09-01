@@ -1,12 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Building2 } from "lucide-react";
+import { ArrowLeft, Building2, Download } from "lucide-react";
+import { toast } from "sonner";
 import { Wordmark } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { formatarData, formatarDataHora, enderecoCompleto } from "@/lib/protocolos";
 import { formatarMoeda, STATUS_VISTORIA_LABEL, type LocacaoPublica } from "@/lib/imoveis";
+
+async function baixarDocumento(path: string) {
+  const { data, error } = await supabase.storage.from("protocolo-docs").createSignedUrl(path, 300);
+  if (error || !data) {
+    toast.error("Não foi possível abrir o documento");
+    return;
+  }
+  window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+}
+
 
 export const Route = createFileRoute("/l/$codigo")({
   head: ({ params }) => ({
