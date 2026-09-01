@@ -489,6 +489,9 @@ export function LocacaoDialog({
         vencimento_dia: Number(form.vencimento_dia) || 10,
         data_pagamento: null,
         status_vistoria: form.status_vistoria || "em_analise",
+        doc_negociacao_nome: form.doc_negociacao_nome,
+        doc_negociacao_url: form.doc_negociacao_url,
+
         observacoes: form.observacoes,
       };
       if (publico) {
