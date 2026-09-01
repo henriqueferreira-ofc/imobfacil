@@ -109,21 +109,68 @@ function ConsultaLocacao() {
             </section>
 
             <section className="shadow-soft rounded-3xl border bg-card p-5 sm:p-8">
-              <h2 className="text-base font-semibold">Partes envolvidas</h2>
-              <dl className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Campo label="Locador" valor={data.proprietario} />
-                <Campo label="Locatário" valor={data.locatario} />
-                <Campo label="E-mail do locador" valor={data.proprietario_email} />
-                <Campo label="E-mail do locatário" valor={data.locatario_email} />
-                <Campo label="Celular do locador" valor={data.proprietario_celular} />
-                <Campo label="Celular do locatário" valor={data.locatario_celular} />
+              <h2 className="text-center text-sm font-bold tracking-wide uppercase">Locador</h2>
+              <dl className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <Campo label="Nome" valor={data.proprietario} />
+                <Campo label="Profissão" valor={data.proprietario_profissao} />
+                <Campo label="Estado civil" valor={data.proprietario_estado_civil} />
+                <Campo label="RG" valor={data.proprietario_rg} />
+                <Campo label="Órgão expedidor" valor={data.proprietario_orgao_expedidor} />
+                <Campo label="CPF" valor={data.proprietario_cpf} />
+                <Campo label="E-mail" valor={data.proprietario_email} />
+                <Campo label="Celular" valor={data.proprietario_celular} />
+                <Campo label="Contato de referência" valor={data.proprietario_contato_referencia} />
               </dl>
+            </section>
+
+            <section className="shadow-soft rounded-3xl border bg-card p-5 sm:p-8">
+              <h2 className="text-center text-sm font-bold tracking-wide uppercase">Locatário</h2>
+              {data.locatario_tipo_pessoa === "juridica" ? (
+                <div className="mt-5 space-y-6">
+                  <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <Campo label="Razão social" valor={data.empresa_nome} />
+                    <Campo label="CNPJ" valor={data.empresa_cnpj} />
+                    <Campo label="Inscrição estadual" valor={data.empresa_insc_estadual} />
+                    <Campo label="Endereço" valor={data.empresa_endereco} />
+                    <Campo label="Bairro" valor={data.empresa_bairro} />
+                    <Campo label="Cidade" valor={data.empresa_cidade} />
+                    <Campo label="Estado" valor={data.empresa_estado} />
+                  </dl>
+                  <div className="border-t pt-5">
+                    <h3 className="text-eyebrow text-muted-foreground">Responsável legal</h3>
+                    <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      <Campo label="Nome" valor={data.resp_nome} />
+                      <Campo label="Estado civil" valor={data.resp_estado_civil} />
+                      <Campo label="Profissão" valor={data.resp_profissao} />
+                      <Campo label="RG" valor={data.resp_rg} />
+                      <Campo label="Órgão expedidor" valor={data.resp_orgao_expedidor} />
+                      <Campo label="CPF" valor={data.resp_cpf} />
+                      <Campo label="E-mail" valor={data.resp_email} />
+                      <Campo label="Celular" valor={data.resp_celular} />
+                      <Campo label="Contato de referência" valor={data.resp_contato_referencia} />
+                    </dl>
+                  </div>
+                </div>
+              ) : (
+                <dl className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <Campo label="Nome" valor={data.locatario} />
+                  <Campo label="Profissão" valor={data.locatario_profissao} />
+                  <Campo label="Estado civil" valor={data.locatario_estado_civil} />
+                  <Campo label="RG" valor={data.locatario_rg} />
+                  <Campo label="Órgão expedidor" valor={data.locatario_orgao_expedidor} />
+                  <Campo label="CPF" valor={data.locatario_cpf} />
+                  <Campo label="E-mail" valor={data.locatario_email} />
+                  <Campo label="Celular" valor={data.locatario_celular} />
+                  <Campo label="Contato de referência" valor={data.locatario_contato_referencia} />
+                </dl>
+              )}
             </section>
 
             <section className="shadow-soft rounded-3xl border bg-card p-5 sm:p-8">
               <h2 className="text-base font-semibold">Dados do imóvel</h2>
               <dl className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <Campo label="Endereço" valor={enderecoCompleto(data)} />
+                <Campo label="Imóvel" valor={data.imovel} />
                 <Campo label="Descrição" valor={data.descricao_imovel} />
               </dl>
             </section>
@@ -131,17 +178,26 @@ function ConsultaLocacao() {
             <section className="shadow-soft rounded-3xl border bg-card p-5 sm:p-8">
               <h2 className="text-base font-semibold">Dados da negociação</h2>
               <dl className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <Campo label="Corretor responsável" valor={data.corretor} />
                 <Campo
                   label="Tipo de locação"
                   valor={data.tipo_locacao === "comercial" ? "Comercial" : "Residencial"}
                 />
                 <Campo label="Prazo" valor={data.prazo} />
                 <Campo label="Valor do aluguel" valor={formatarMoeda(Number(data.valor_aluguel))} />
+                <Campo label="Garantia" valor={data.garantia} />
+                {data.garantia_caucao && (
+                  <Campo label="Valor do caução" valor={formatarMoeda(Number(data.valor_caucao))} />
+                )}
                 <Campo
-                  label="Início"
+                  label="Início do contrato"
                   valor={data.inicio_contrato ? formatarData(data.inicio_contrato) : ""}
                 />
-                <Campo label="Vencimento" valor={`Dia ${data.vencimento_dia}`} />
+                <Campo
+                  label="Data de pagamento"
+                  valor={data.data_pagamento ? formatarData(data.data_pagamento) : ""}
+                />
+                <Campo label="Dia de vencimento" valor={`Dia ${data.vencimento_dia}`} />
                 <Campo label="Administração" valor={data.administracao ? "Sim" : "Não"} />
               </dl>
             </section>
