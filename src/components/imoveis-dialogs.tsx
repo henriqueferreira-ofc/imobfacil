@@ -103,7 +103,10 @@ const CAMPOS_LOCACAO_TEXTO = [
   "vencimento_dia",
   "data_pagamento",
   "status_vistoria",
+  "doc_negociacao_nome",
+  "doc_negociacao_url",
   "observacoes",
+
 ] as const;
 
 type LocacaoCampo = (typeof CAMPOS_LOCACAO_TEXTO)[number];
