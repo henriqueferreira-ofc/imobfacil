@@ -87,7 +87,10 @@ export interface Locacao {
   inicio_contrato: string | null;
   vencimento_dia: number;
   status_vistoria: string;
+  doc_negociacao_nome: string;
+  doc_negociacao_url: string;
   observacoes: string;
+
   created_at: string;
   updated_at: string;
 }

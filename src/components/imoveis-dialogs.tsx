@@ -103,7 +103,10 @@ const CAMPOS_LOCACAO_TEXTO = [
   "vencimento_dia",
   "data_pagamento",
   "status_vistoria",
+  "doc_negociacao_nome",
+  "doc_negociacao_url",
   "observacoes",
+
 ] as const;
 
 type LocacaoCampo = (typeof CAMPOS_LOCACAO_TEXTO)[number];
@@ -241,10 +244,12 @@ function AnexoBotao({
   valor,
   onChange,
   label,
+  publicoDownload = false,
 }: {
   valor: string;
   onChange: (path: string) => void;
   label: string;
+  publicoDownload?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [enviando, setEnviando] = useState(false);
@@ -252,8 +257,11 @@ function AnexoBotao({
   async function enviar(file: File) {
     setEnviando(true);
     const ext = file.name.split(".").pop() ?? "pdf";
-    const path = `locacoes/${crypto.randomUUID()}.${ext}`;
+    const path = publicoDownload
+      ? `locacoes/publico/${crypto.randomUUID()}.${ext}`
+      : `locacoes/${crypto.randomUUID()}.${ext}`;
     const { error } = await supabase.storage.from("protocolo-docs").upload(path, file);
+
     setEnviando(false);
     if (error) {
       toast.error(`Erro ao anexar ${label}`, { description: error.message });
@@ -481,6 +489,9 @@ export function LocacaoDialog({
         vencimento_dia: Number(form.vencimento_dia) || 10,
         data_pagamento: null,
         status_vistoria: form.status_vistoria || "em_analise",
+        doc_negociacao_nome: form.doc_negociacao_nome,
+        doc_negociacao_url: form.doc_negociacao_url,
+
         observacoes: form.observacoes,
       };
       if (publico) {
@@ -959,6 +970,27 @@ export function LocacaoDialog({
                 { value: "20", label: "20" },
               ]}
             />
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="loc-doc-negociacao">Documento da negociação (público)</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="loc-doc-negociacao"
+                  value={form.doc_negociacao_nome}
+                  onChange={(e) => set("doc_negociacao_nome", e.target.value)}
+                  placeholder="Ex.: Contrato de locação assinado"
+                />
+                <AnexoBotao
+                  label="Documento da negociação"
+                  publicoDownload
+                  valor={form.doc_negociacao_url}
+                  onChange={(path) => set("doc_negociacao_url", path)}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Este anexo fica disponível para download na consulta pública da locação.
+              </p>
+            </div>
+
             <CampoSelect
               campo="status_vistoria"
               label="Status da vistoria"

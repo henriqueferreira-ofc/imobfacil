@@ -74,6 +74,8 @@ export type Database = {
           created_by: string | null
           data_pagamento: string | null
           descricao_imovel: string
+          doc_negociacao_nome: string
+          doc_negociacao_url: string
           empresa_bairro: string
           empresa_cartao_cnpj_url: string
           empresa_cidade: string
@@ -155,6 +157,8 @@ export type Database = {
           created_by?: string | null
           data_pagamento?: string | null
           descricao_imovel?: string
+          doc_negociacao_nome?: string
+          doc_negociacao_url?: string
           empresa_bairro?: string
           empresa_cartao_cnpj_url?: string
           empresa_cidade?: string
@@ -236,6 +240,8 @@ export type Database = {
           created_by?: string | null
           data_pagamento?: string | null
           descricao_imovel?: string
+          doc_negociacao_nome?: string
+          doc_negociacao_url?: string
           empresa_bairro?: string
           empresa_cartao_cnpj_url?: string
           empresa_cidade?: string
@@ -453,6 +459,8 @@ export type Database = {
           codigo: string
           created_at: string
           descricao_imovel: string
+          doc_negociacao_nome: string
+          doc_negociacao_url: string
           endereco: string
           estado: string
           garantia: string
