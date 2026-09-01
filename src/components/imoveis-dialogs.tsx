@@ -241,10 +241,12 @@ function AnexoBotao({
   valor,
   onChange,
   label,
+  publicoDownload = false,
 }: {
   valor: string;
   onChange: (path: string) => void;
   label: string;
+  publicoDownload?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [enviando, setEnviando] = useState(false);
@@ -252,8 +254,11 @@ function AnexoBotao({
   async function enviar(file: File) {
     setEnviando(true);
     const ext = file.name.split(".").pop() ?? "pdf";
-    const path = `locacoes/${crypto.randomUUID()}.${ext}`;
+    const path = publicoDownload
+      ? `locacoes/publico/${crypto.randomUUID()}.${ext}`
+      : `locacoes/${crypto.randomUUID()}.${ext}`;
     const { error } = await supabase.storage.from("protocolo-docs").upload(path, file);
+
     setEnviando(false);
     if (error) {
       toast.error(`Erro ao anexar ${label}`, { description: error.message });
