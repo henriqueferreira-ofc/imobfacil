@@ -970,6 +970,27 @@ export function LocacaoDialog({
                 { value: "20", label: "20" },
               ]}
             />
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="loc-doc-negociacao">Documento da negociação (público)</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="loc-doc-negociacao"
+                  value={form.doc_negociacao_nome}
+                  onChange={(e) => set("doc_negociacao_nome", e.target.value)}
+                  placeholder="Ex.: Contrato de locação assinado"
+                />
+                <AnexoBotao
+                  label="Documento da negociação"
+                  publicoDownload
+                  valor={form.doc_negociacao_url}
+                  onChange={(path) => set("doc_negociacao_url", path)}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Este anexo fica disponível para download na consulta pública da locação.
+              </p>
+            </div>
+
             <CampoSelect
               campo="status_vistoria"
               label="Status da vistoria"
