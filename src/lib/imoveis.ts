@@ -83,6 +83,7 @@ export interface Locacao {
   corretor: string;
   prazo: string;
   administracao: boolean;
+  garantia: string;
   valor_aluguel: number;
   inicio_contrato: string | null;
   vencimento_dia: number;
