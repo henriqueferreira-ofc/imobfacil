@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Building2, Download } from "lucide-react";
+import { jsPDF } from "jspdf";
+import { ArrowLeft, Building2, Download, FileDown } from "lucide-react";
 import { toast } from "sonner";
 import { Wordmark } from "@/components/brand";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,176 @@ async function baixarDocumento(path: string) {
   window.open(data.signedUrl, "_blank", "noopener,noreferrer");
 }
 
+function valorPdf(valor: string | number | boolean | null | undefined) {
+  if (typeof valor === "boolean") return valor ? "Sim" : "Não";
+  const texto = String(valor ?? "").trim();
+  return texto || "-";
+}
+
+function adicionarSecaoPdf(
+  doc: jsPDF,
+  titulo: string,
+  campos: Array<[string, string | number | boolean | null | undefined]>,
+  yInicial: number,
+) {
+  const margemX = 16;
+  const larguraPagina = doc.internal.pageSize.getWidth();
+  const alturaPagina = doc.internal.pageSize.getHeight();
+  let y = yInicial;
+
+  if (y > alturaPagina - 32) {
+    doc.addPage();
+    y = 18;
+  }
+
+  doc.setFillColor(244, 247, 251);
+  doc.roundedRect(margemX, y, larguraPagina - margemX * 2, 10, 2, 2, "F");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.setTextColor(15, 23, 42);
+  doc.text(titulo, margemX + 4, y + 6.5);
+  y += 16;
+
+  campos.forEach(([label, valor]) => {
+    const texto = valorPdf(valor);
+    const linhas = doc.splitTextToSize(texto, larguraPagina - margemX * 2 - 42);
+    const alturaCampo = Math.max(10, linhas.length * 5 + 5);
+
+    if (y + alturaCampo > alturaPagina - 18) {
+      doc.addPage();
+      y = 18;
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
+    doc.text(label.toUpperCase(), margemX, y);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(15, 23, 42);
+    doc.text(linhas, margemX + 42, y);
+    y += alturaCampo;
+  });
+
+  return y + 4;
+}
+
+function baixarPdfLocacao(data: LocacaoPublica) {
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const larguraPagina = doc.internal.pageSize.getWidth();
+  let y = 18;
+
+  doc.setFillColor(31, 58, 169);
+  doc.rect(0, 0, larguraPagina, 42, "F");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.setTextColor(255, 255, 255);
+  doc.text("Contrato de Locação", 16, 18);
+  doc.setFontSize(12);
+  doc.text(data.codigo, 16, 28);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.text(
+    `Status: ${STATUS_VISTORIA_LABEL[data.status_vistoria] ?? data.status_vistoria}`,
+    16,
+    36,
+  );
+
+  y = 54;
+  y = adicionarSecaoPdf(
+    doc,
+    "Locador",
+    [
+      ["Nome", data.proprietario],
+      ["Profissão", data.proprietario_profissao],
+      ["Estado civil", data.proprietario_estado_civil],
+      ["RG", data.proprietario_rg],
+      ["Órgão expedidor", data.proprietario_orgao_expedidor],
+      ["CPF", data.proprietario_cpf],
+      ["E-mail", data.proprietario_email],
+      ["Celular", data.proprietario_celular],
+      ["Contato de referência", data.proprietario_contato_referencia],
+    ],
+    y,
+  );
+
+  y = adicionarSecaoPdf(
+    doc,
+    "Locatário",
+    data.locatario_tipo_pessoa === "juridica"
+      ? [
+          ["Tipo de pessoa", "Jurídica"],
+          ["Razão social", data.empresa_nome],
+          ["CNPJ", data.empresa_cnpj],
+          ["Inscrição estadual", data.empresa_insc_estadual],
+          ["Endereço", data.empresa_endereco],
+          ["Bairro", data.empresa_bairro],
+          ["Cidade", data.empresa_cidade],
+          ["Estado", data.empresa_estado],
+          ["Responsável legal", data.resp_nome],
+          ["Estado civil do responsável", data.resp_estado_civil],
+          ["Profissão do responsável", data.resp_profissao],
+          ["RG do responsável", data.resp_rg],
+          ["Órgão expedidor", data.resp_orgao_expedidor],
+          ["CPF do responsável", data.resp_cpf],
+          ["E-mail do responsável", data.resp_email],
+          ["Celular do responsável", data.resp_celular],
+          ["Contato de referência", data.resp_contato_referencia],
+        ]
+      : [
+          ["Tipo de pessoa", "Física"],
+          ["Nome", data.locatario],
+          ["Profissão", data.locatario_profissao],
+          ["Estado civil", data.locatario_estado_civil],
+          ["RG", data.locatario_rg],
+          ["Órgão expedidor", data.locatario_orgao_expedidor],
+          ["CPF", data.locatario_cpf],
+          ["E-mail", data.locatario_email],
+          ["Celular", data.locatario_celular],
+          ["Contato de referência", data.locatario_contato_referencia],
+        ],
+    y,
+  );
+
+  y = adicionarSecaoPdf(
+    doc,
+    "Dados do imóvel",
+    [
+      ["Endereço", enderecoCompleto(data)],
+      ["Imóvel", data.imovel],
+      ["Descrição", data.descricao_imovel],
+    ],
+    y,
+  );
+
+  y = adicionarSecaoPdf(
+    doc,
+    "Dados da negociação",
+    [
+      ["Corretor responsável", data.corretor],
+      ["Tipo de locação", data.tipo_locacao === "comercial" ? "Comercial" : "Residencial"],
+      ["Prazo", data.prazo],
+      ["Valor do aluguel", formatarMoeda(Number(data.valor_aluguel))],
+      ["Garantia", data.garantia],
+      ["Valor do caução", data.garantia_caucao ? formatarMoeda(Number(data.valor_caucao)) : ""],
+      ["Início do contrato", data.inicio_contrato ? formatarData(data.inicio_contrato) : ""],
+      ["Data de pagamento", data.data_pagamento ? formatarData(data.data_pagamento) : ""],
+      ["Dia de vencimento", data.vencimento_dia ? `Dia ${data.vencimento_dia}` : ""],
+      ["Administração", data.administracao],
+    ],
+    y,
+  );
+
+  adicionarSecaoPdf(
+    doc,
+    "Histórico e observações",
+    [["Observações", data.observacoes || "Nenhuma observação registrada até o momento."]],
+    y,
+  );
+
+  doc.save(`${data.codigo || "locacao"}-contrato.pdf`);
+}
 
 export const Route = createFileRoute("/l/$codigo")({
   head: ({ params }) => ({
@@ -94,13 +265,25 @@ function ConsultaLocacao() {
           <div className="space-y-4">
             <section className="bg-brand-gradient shadow-panel rounded-3xl px-5 py-6 text-primary-foreground sm:px-10 sm:py-8">
               <p className="text-eyebrow text-primary-foreground/70">Locação</p>
-              <div className="mt-2 flex flex-col items-start gap-3 sm:grid sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-4">
+              <div className="mt-2 flex flex-col items-start gap-3 sm:grid sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start sm:gap-4">
                 <h1 className="font-display text-2xl font-bold break-all sm:truncate sm:break-normal sm:text-3xl lg:text-4xl">
                   {data.codigo}
                 </h1>
-                <span className="rounded-full bg-card px-3 py-1.5 text-sm font-semibold text-foreground">
-                  {STATUS_VISTORIA_LABEL[data.status_vistoria] ?? data.status_vistoria}
-                </span>
+                <div className="flex flex-col items-start gap-2 sm:items-end">
+                  <span className="rounded-full bg-card px-3 py-1.5 text-sm font-semibold text-foreground">
+                    {STATUS_VISTORIA_LABEL[data.status_vistoria] ?? data.status_vistoria}
+                  </span>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    className="h-8 rounded-full bg-white/15 px-3 text-primary-foreground hover:bg-white/25"
+                    onClick={() => baixarPdfLocacao(data)}
+                  >
+                    <FileDown className="size-4" />
+                    Baixar PDF
+                  </Button>
+                </div>
               </div>
               <p className="mt-3 text-sm text-primary-foreground/75">
                 Aberta em {formatarDataHora(data.created_at)} • atualizada em{" "}
@@ -223,7 +406,6 @@ function ConsultaLocacao() {
                 {data.observacoes || "Nenhuma observação registrada até o momento."}
               </p>
             </section>
-
           </div>
         )}
       </main>
