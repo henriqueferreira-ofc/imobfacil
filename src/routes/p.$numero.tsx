@@ -121,7 +121,6 @@ function ConsultaProtocolo() {
                 {data.tipo_negociacao === "financiamento" && (
                   <Campo label="Banco" valor={data.banco} />
                 )}
-
               </dl>
             </section>
 
@@ -129,11 +128,7 @@ function ConsultaProtocolo() {
               <h2 className="text-base font-semibold">Endereço do imóvel</h2>
               <dl className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <Campo label="Endereço" valor={data.endereco} />
-                <Campo label="Número" valor={data.numero_casa} />
                 <Campo label="Bairro" valor={data.bairro} />
-                <Campo label="CEP" valor={data.cep} />
-                <Campo label="Cidade" valor={data.cidade} />
-                <Campo label="Estado" valor={data.estado} />
               </dl>
             </section>
 
