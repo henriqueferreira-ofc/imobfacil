@@ -554,6 +554,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_locacao_doc_publico: { Args: { _path: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
