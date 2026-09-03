@@ -1,10 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { jsPDF } from "jspdf";
-import { ArrowLeft, Building2, Download, FileDown } from "lucide-react";
+import { ArrowLeft, Building2, Download, FileDown, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { Wordmark } from "@/components/brand";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { formatarData, formatarDataHora, enderecoCompleto } from "@/lib/protocolos";
@@ -36,14 +46,78 @@ function mascararUltimos(valor: string, visiveis = 4) {
   return `${"*".repeat(Math.max(base.length - visiveis, 4))}${base.slice(-visiveis)}`;
 }
 
-function baixarPdfComSenha(data: LocacaoPublica) {
-  const senha = window.prompt("Digite a senha de 4 dígitos para baixar o PDF:");
-  if (senha === null) return;
-  if (senha.trim() !== SENHA_PDF_LOCACAO) {
-    toast.error("Senha incorreta");
-    return;
+function SenhaPdfDialog({
+  open,
+  onOpenChange,
+  onConfirmado,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  onConfirmado: () => void;
+}) {
+  const [senha, setSenha] = useState("");
+
+  function confirmar(valor = senha) {
+    if (valor.trim() !== SENHA_PDF_LOCACAO) {
+      toast.error("Senha incorreta", { description: "Confira os 4 dígitos e tente novamente." });
+      setSenha("");
+      return;
+    }
+    onOpenChange(false);
+    setSenha("");
+    onConfirmado();
   }
-  baixarPdfLocacao(data);
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        onOpenChange(v);
+        if (!v) setSenha("");
+      }}
+    >
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader className="items-center text-center">
+          <span className="flex size-11 items-center justify-center rounded-2xl bg-secondary text-secondary-foreground">
+            <Lock className="size-5" />
+          </span>
+          <DialogTitle className="mt-2">Download protegido</DialogTitle>
+          <DialogDescription>
+            Digite a senha de 4 dígitos para baixar o PDF da locação.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="flex justify-center py-2">
+          <InputOTP
+            maxLength={4}
+            value={senha}
+            autoFocus
+            onChange={(v) => {
+              setSenha(v);
+              if (v.length === 4) confirmar(v);
+            }}
+          >
+            <InputOTPGroup>
+              <InputOTPSlot index={0} />
+              <InputOTPSlot index={1} />
+              <InputOTPSlot index={2} />
+              <InputOTPSlot index={3} />
+            </InputOTPGroup>
+          </InputOTP>
+        </div>
+
+        <DialogFooter className="sm:justify-center">
+          <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+            Cancelar
+          </Button>
+          <Button type="button" onClick={() => confirmar()} disabled={senha.length < 4}>
+            <FileDown className="size-4" />
+            Baixar PDF
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 function adicionarSecaoPdf(
@@ -240,6 +314,7 @@ function Campo({ label, valor }: { label: string; valor: string }) {
 
 function ConsultaLocacao() {
   const { codigo } = Route.useParams();
+  const [senhaAberta, setSenhaAberta] = useState(false);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["locacao-publica", codigo],
@@ -299,7 +374,7 @@ function ConsultaLocacao() {
                     size="sm"
                     variant="secondary"
                     className="h-8 rounded-full bg-white/15 px-3 text-primary-foreground hover:bg-white/25"
-                    onClick={() => baixarPdfComSenha(data)}
+                    onClick={() => setSenhaAberta(true)}
                   >
                     <FileDown className="size-4" />
                     Baixar PDF
@@ -311,6 +386,12 @@ function ConsultaLocacao() {
                 {formatarDataHora(data.updated_at)}
               </p>
             </section>
+
+            <SenhaPdfDialog
+              open={senhaAberta}
+              onOpenChange={setSenhaAberta}
+              onConfirmado={() => baixarPdfLocacao(data)}
+            />
 
             <section className="shadow-soft rounded-3xl border bg-card p-5 sm:p-8">
               <h2 className="text-center text-sm font-bold tracking-wide uppercase">Locador</h2>
