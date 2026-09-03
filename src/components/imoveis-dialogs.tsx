@@ -106,7 +106,6 @@ const CAMPOS_LOCACAO_TEXTO = [
   "doc_negociacao_nome",
   "doc_negociacao_url",
   "observacoes",
-
 ] as const;
 
 type LocacaoCampo = (typeof CAMPOS_LOCACAO_TEXTO)[number];
@@ -221,6 +220,34 @@ function formatarMoedaInput(valor: string) {
 function moedaInputParaNumero(valor: string) {
   if (!valor) return 0;
   return Number(valor.replace(/\./g, "").replace(",", ".")) || 0;
+}
+
+function cpfValido(valor: string) {
+  const cpf = valor.replace(/\D/g, "");
+  if (!cpf) return true;
+  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+
+  const calcularDigito = (base: string, pesoInicial: number) => {
+    const soma = base
+      .split("")
+      .reduce((total, digito, index) => total + Number(digito) * (pesoInicial - index), 0);
+    const resto = (soma * 10) % 11;
+    return resto === 10 ? 0 : resto;
+  };
+
+  const digito1 = calcularDigito(cpf.slice(0, 9), 10);
+  const digito2 = calcularDigito(cpf.slice(0, 10), 11);
+  return digito1 === Number(cpf[9]) && digito2 === Number(cpf[10]);
+}
+
+function formatarCpfInput(valor: string) {
+  const digitos = valor.replace(/\D/g, "").slice(0, 11);
+  if (digitos.length <= 3) return digitos;
+  if (digitos.length <= 6) return `${digitos.slice(0, 3)}.${digitos.slice(3)}`;
+  if (digitos.length <= 9) {
+    return `${digitos.slice(0, 3)}.${digitos.slice(3, 6)}.${digitos.slice(6)}`;
+  }
+  return `${digitos.slice(0, 3)}.${digitos.slice(3, 6)}.${digitos.slice(6, 9)}-${digitos.slice(9)}`;
 }
 
 function erroColunaCorretor(error: unknown) {
@@ -417,6 +444,16 @@ export function LocacaoDialog({
 
   const salvar = useMutation({
     mutationFn: async () => {
+      const cpfInvalido = [
+        ["CPF do locador", form.proprietario_cpf],
+        ["CPF do locatário", form.locatario_cpf],
+        ["CPF do responsável", form.resp_cpf],
+      ].find(([, valor]) => !cpfValido(String(valor)));
+
+      if (cpfInvalido) {
+        throw new Error(`${cpfInvalido[0]} inválido. Confira o número antes de salvar.`);
+      }
+
       const payload = {
         endereco: form.endereco,
         numero_casa: form.numero_casa,
@@ -711,7 +748,14 @@ export function LocacaoDialog({
             />
             {campoTexto("proprietario_rg", "RG")}
             {campoTexto("proprietario_orgao_expedidor", "Órgão expedidor")}
-            {campoTexto("proprietario_cpf", "CPF")}
+            {campoTexto(
+              "proprietario_cpf",
+              "CPF",
+              undefined,
+              "numeric",
+              undefined,
+              formatarCpfInput,
+            )}
             {campoTexto("proprietario_email", "E-mail", "email")}
             {campoTexto("proprietario_celular", "Celular", undefined, "tel")}
             {campoTexto("proprietario_contato_referencia", "Contato de referência")}
@@ -764,7 +808,14 @@ export function LocacaoDialog({
                 {campoTexto("locatario_profissao", "Profissão")}
                 {campoTexto("locatario_rg", "RG")}
                 {campoTexto("locatario_orgao_expedidor", "Órgão expedidor")}
-                {campoTexto("locatario_cpf", "CPF")}
+                {campoTexto(
+                  "locatario_cpf",
+                  "CPF",
+                  undefined,
+                  "numeric",
+                  undefined,
+                  formatarCpfInput,
+                )}
                 {campoTexto("locatario_email", "E-mail", "email")}
                 {campoTexto("locatario_celular", "Celular", undefined, "tel")}
                 {campoTexto("locatario_contato_referencia", "Contato de referência")}
@@ -837,7 +888,7 @@ export function LocacaoDialog({
                 {campoTexto("resp_profissao", "Profissão")}
                 {campoTexto("resp_rg", "RG")}
                 {campoTexto("resp_orgao_expedidor", "Órgão expedidor")}
-                {campoTexto("resp_cpf", "CPF")}
+                {campoTexto("resp_cpf", "CPF", undefined, "numeric", undefined, formatarCpfInput)}
                 {campoTexto("resp_email", "E-mail", "email")}
                 {campoTexto("resp_celular", "Celular", undefined, "tel")}
                 {campoTexto("resp_contato_referencia", "Contato de referência")}

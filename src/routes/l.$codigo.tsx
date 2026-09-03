@@ -10,6 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatarData, formatarDataHora, enderecoCompleto } from "@/lib/protocolos";
 import { formatarMoeda, STATUS_VISTORIA_LABEL, type LocacaoPublica } from "@/lib/imoveis";
 
+const SENHA_PDF_LOCACAO = "1298";
+
 async function baixarDocumento(path: string) {
   const { data, error } = await supabase.storage.from("protocolo-docs").createSignedUrl(path, 300);
   if (error || !data) {
@@ -23,6 +25,25 @@ function valorPdf(valor: string | number | boolean | null | undefined) {
   if (typeof valor === "boolean") return valor ? "Sim" : "Não";
   const texto = String(valor ?? "").trim();
   return texto || "-";
+}
+
+function mascararUltimos(valor: string, visiveis = 4) {
+  const texto = String(valor ?? "").trim();
+  const digitos = texto.replace(/\D/g, "");
+  const base = digitos || texto;
+  if (!base) return "";
+  if (base.length <= visiveis) return base;
+  return `${"*".repeat(Math.max(base.length - visiveis, 4))}${base.slice(-visiveis)}`;
+}
+
+function baixarPdfComSenha(data: LocacaoPublica) {
+  const senha = window.prompt("Digite a senha de 4 dígitos para baixar o PDF:");
+  if (senha === null) return;
+  if (senha.trim() !== SENHA_PDF_LOCACAO) {
+    toast.error("Senha incorreta");
+    return;
+  }
+  baixarPdfLocacao(data);
 }
 
 function adicionarSecaoPdf(
@@ -278,7 +299,7 @@ function ConsultaLocacao() {
                     size="sm"
                     variant="secondary"
                     className="h-8 rounded-full bg-white/15 px-3 text-primary-foreground hover:bg-white/25"
-                    onClick={() => baixarPdfLocacao(data)}
+                    onClick={() => baixarPdfComSenha(data)}
                   >
                     <FileDown className="size-4" />
                     Baixar PDF
@@ -299,10 +320,13 @@ function ConsultaLocacao() {
                 <Campo label="Estado civil" valor={data.proprietario_estado_civil} />
                 <Campo label="RG" valor={data.proprietario_rg} />
                 <Campo label="Órgão expedidor" valor={data.proprietario_orgao_expedidor} />
-                <Campo label="CPF" valor={data.proprietario_cpf} />
+                <Campo label="CPF" valor={mascararUltimos(data.proprietario_cpf)} />
                 <Campo label="E-mail" valor={data.proprietario_email} />
-                <Campo label="Celular" valor={data.proprietario_celular} />
-                <Campo label="Contato de referência" valor={data.proprietario_contato_referencia} />
+                <Campo label="Celular" valor={mascararUltimos(data.proprietario_celular)} />
+                <Campo
+                  label="Contato de referência"
+                  valor={mascararUltimos(data.proprietario_contato_referencia)}
+                />
               </dl>
             </section>
 
@@ -327,10 +351,13 @@ function ConsultaLocacao() {
                       <Campo label="Profissão" valor={data.resp_profissao} />
                       <Campo label="RG" valor={data.resp_rg} />
                       <Campo label="Órgão expedidor" valor={data.resp_orgao_expedidor} />
-                      <Campo label="CPF" valor={data.resp_cpf} />
+                      <Campo label="CPF" valor={mascararUltimos(data.resp_cpf)} />
                       <Campo label="E-mail" valor={data.resp_email} />
-                      <Campo label="Celular" valor={data.resp_celular} />
-                      <Campo label="Contato de referência" valor={data.resp_contato_referencia} />
+                      <Campo label="Celular" valor={mascararUltimos(data.resp_celular)} />
+                      <Campo
+                        label="Contato de referência"
+                        valor={mascararUltimos(data.resp_contato_referencia)}
+                      />
                     </dl>
                   </div>
                 </div>
@@ -341,10 +368,13 @@ function ConsultaLocacao() {
                   <Campo label="Estado civil" valor={data.locatario_estado_civil} />
                   <Campo label="RG" valor={data.locatario_rg} />
                   <Campo label="Órgão expedidor" valor={data.locatario_orgao_expedidor} />
-                  <Campo label="CPF" valor={data.locatario_cpf} />
+                  <Campo label="CPF" valor={mascararUltimos(data.locatario_cpf)} />
                   <Campo label="E-mail" valor={data.locatario_email} />
-                  <Campo label="Celular" valor={data.locatario_celular} />
-                  <Campo label="Contato de referência" valor={data.locatario_contato_referencia} />
+                  <Campo label="Celular" valor={mascararUltimos(data.locatario_celular)} />
+                  <Campo
+                    label="Contato de referência"
+                    valor={mascararUltimos(data.locatario_contato_referencia)}
+                  />
                 </dl>
               )}
             </section>
