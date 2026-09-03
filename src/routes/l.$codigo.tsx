@@ -314,6 +314,7 @@ function Campo({ label, valor }: { label: string; valor: string }) {
 
 function ConsultaLocacao() {
   const { codigo } = Route.useParams();
+  const [senhaAberta, setSenhaAberta] = useState(false);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["locacao-publica", codigo],
