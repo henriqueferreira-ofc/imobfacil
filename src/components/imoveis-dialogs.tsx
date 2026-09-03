@@ -271,12 +271,10 @@ function AnexoBotao({
   valor,
   onChange,
   label,
-  publicoDownload = false,
 }: {
   valor: string;
   onChange: (path: string) => void;
   label: string;
-  publicoDownload?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [enviando, setEnviando] = useState(false);
@@ -284,9 +282,7 @@ function AnexoBotao({
   async function enviar(file: File) {
     setEnviando(true);
     const ext = file.name.split(".").pop() ?? "pdf";
-    const path = publicoDownload
-      ? `locacoes/publico/${crypto.randomUUID()}.${ext}`
-      : `locacoes/${crypto.randomUUID()}.${ext}`;
+    const path = `locacoes/${crypto.randomUUID()}.${ext}`;
     const { error } = await supabase.storage.from("protocolo-docs").upload(path, file);
 
     setEnviando(false);
@@ -1032,7 +1028,6 @@ export function LocacaoDialog({
                 />
                 <AnexoBotao
                   label="Documento da negociação"
-                  publicoDownload
                   valor={form.doc_negociacao_url}
                   onChange={(path) => set("doc_negociacao_url", path)}
                 />
