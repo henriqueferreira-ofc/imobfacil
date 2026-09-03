@@ -46,14 +46,78 @@ function mascararUltimos(valor: string, visiveis = 4) {
   return `${"*".repeat(Math.max(base.length - visiveis, 4))}${base.slice(-visiveis)}`;
 }
 
-function baixarPdfComSenha(data: LocacaoPublica) {
-  const senha = window.prompt("Digite a senha de 4 dígitos para baixar o PDF:");
-  if (senha === null) return;
-  if (senha.trim() !== SENHA_PDF_LOCACAO) {
-    toast.error("Senha incorreta");
-    return;
+function SenhaPdfDialog({
+  open,
+  onOpenChange,
+  onConfirmado,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  onConfirmado: () => void;
+}) {
+  const [senha, setSenha] = useState("");
+
+  function confirmar(valor = senha) {
+    if (valor.trim() !== SENHA_PDF_LOCACAO) {
+      toast.error("Senha incorreta", { description: "Confira os 4 dígitos e tente novamente." });
+      setSenha("");
+      return;
+    }
+    onOpenChange(false);
+    setSenha("");
+    onConfirmado();
   }
-  baixarPdfLocacao(data);
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        onOpenChange(v);
+        if (!v) setSenha("");
+      }}
+    >
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader className="items-center text-center">
+          <span className="flex size-11 items-center justify-center rounded-2xl bg-secondary text-secondary-foreground">
+            <Lock className="size-5" />
+          </span>
+          <DialogTitle className="mt-2">Download protegido</DialogTitle>
+          <DialogDescription>
+            Digite a senha de 4 dígitos para baixar o PDF da locação.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="flex justify-center py-2">
+          <InputOTP
+            maxLength={4}
+            value={senha}
+            autoFocus
+            onChange={(v) => {
+              setSenha(v);
+              if (v.length === 4) confirmar(v);
+            }}
+          >
+            <InputOTPGroup>
+              <InputOTPSlot index={0} />
+              <InputOTPSlot index={1} />
+              <InputOTPSlot index={2} />
+              <InputOTPSlot index={3} />
+            </InputOTPGroup>
+          </InputOTP>
+        </div>
+
+        <DialogFooter className="sm:justify-center">
+          <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+            Cancelar
+          </Button>
+          <Button type="button" onClick={() => confirmar()} disabled={senha.length < 4}>
+            <FileDown className="size-4" />
+            Baixar PDF
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 function adicionarSecaoPdf(
