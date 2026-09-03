@@ -551,6 +551,7 @@ function AnaliseModule({
     const porStatus = Object.entries(STATUS_LABEL).map(([status, label]) => ({
       status,
       label,
+      labelCurto: label.replace("Em ", ""),
       total: protocolos.filter((p) => p.status === status).length,
     }));
     const porImovel = Object.entries(TIPO_IMOVEL_LABEL).map(([tipo, label]) => ({
@@ -590,6 +591,7 @@ function AnaliseModule({
     const modulos = [
       {
         modulo: "Protocolo de Documentos",
+        moduloCurto: "Protocolos",
         total,
         emAnalise: protocolos.filter((p) => p.status === "em_analise").length,
         emAndamento: protocolos.filter((p) => p.status === "em_andamento").length,
@@ -598,6 +600,7 @@ function AnaliseModule({
       },
       {
         modulo: "Locação de Imóveis",
+        moduloCurto: "Locações",
         total: locacoes.length,
         emAnalise: locacoes.filter((l) => l.status_vistoria === "em_analise").length,
         emAndamento: locacoes.filter((l) => l.status_vistoria === "em_andamento").length,
@@ -606,6 +609,7 @@ function AnaliseModule({
       },
       {
         modulo: "Administração de Imóveis",
+        moduloCurto: "Admin.",
         total: imoveisAdministrados.length,
         emAnalise: imoveisAdministrados.filter((i) => i.status === "em_analise").length,
         emAndamento: imoveisAdministrados.filter((i) => i.status === "em_andamento").length,
@@ -647,11 +651,13 @@ function AnaliseModule({
   }
 
   return (
-    <div className="space-y-5">
+    <div className="min-w-0 space-y-4 sm:space-y-5">
       <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
-        <div>
+        <div className="min-w-0">
           <p className="text-eyebrow text-muted-foreground">Inteligência do negócio</p>
-          <h1 className="mt-2 font-display text-xl font-bold sm:text-2xl">Análise de Dados</h1>
+          <h1 className="mt-2 font-display text-xl font-bold break-words sm:text-2xl">
+            Análise de Dados
+          </h1>
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
             Relatório gerencial consolidado dos três módulos, com leitura específica para Protocolo
             de Documentos, Locação de Imóveis e Administração de Imóveis.
@@ -666,29 +672,34 @@ function AnaliseModule({
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
         {[
           { label: "Registros totais", valor: analise.totalGeral },
           { label: "Protocolos", valor: analise.total },
           { label: "Locações", valor: locacoes.length },
           { label: "Administração", valor: imoveisAdministrados.length },
         ].map((item) => (
-          <div key={item.label} className="shadow-soft rounded-2xl border bg-card p-4">
+          <div
+            key={item.label}
+            className="shadow-soft min-w-0 rounded-2xl border bg-card p-3 sm:p-4"
+          >
             <p className="text-eyebrow text-muted-foreground">{item.label}</p>
-            <p className="mt-1.5 font-display text-lg font-bold break-words sm:text-2xl">
+            <p className="mt-1.5 font-display text-base font-bold break-words sm:text-2xl">
               {item.valor}
             </p>
           </div>
         ))}
       </div>
 
-      <section className="shadow-soft rounded-2xl border bg-card p-4 sm:p-5">
-        <h2 className="font-display text-lg font-bold">Análise por módulo</h2>
+      <section className="shadow-soft min-w-0 rounded-2xl border bg-card p-4 sm:p-5">
+        <h2 className="font-display text-lg font-bold break-words">Análise por módulo</h2>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {analise.modulos.map((modulo) => (
-            <div key={modulo.modulo} className="rounded-xl border bg-background p-4">
-              <h3 className="font-display font-bold">{modulo.modulo}</h3>
-              <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
+            <div key={modulo.modulo} className="min-w-0 rounded-xl border bg-background p-3 sm:p-4">
+              <h3 className="font-display text-sm font-bold break-words sm:text-base">
+                {modulo.modulo}
+              </h3>
+              <dl className="mt-3 grid grid-cols-2 gap-2 text-sm sm:gap-3">
                 <AnaliseMetric label="Total" value={String(modulo.total)} />
                 <AnaliseMetric label="Em análise" value={String(modulo.emAnalise)} />
                 <AnaliseMetric label="Em andamento" value={String(modulo.emAndamento)} />
@@ -707,26 +718,37 @@ function AnaliseModule({
         </div>
       </section>
 
-      <section className="shadow-soft rounded-2xl border bg-card p-4 sm:p-5">
-        <h2 className="font-display text-lg font-bold">Registros por módulo</h2>
+      <section className="shadow-soft min-w-0 rounded-2xl border bg-card p-4 sm:p-5">
+        <h2 className="font-display text-lg font-bold break-words">Registros por módulo</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Comparativo direto entre os três módulos do sistema.
         </p>
         <ChartContainer
           config={{ total: { label: "Registros", color: "var(--color-brand-bright)" } }}
-          className="mt-4 h-72 w-full"
+          className="mt-4 h-56 w-full sm:h-64 lg:h-72"
         >
-          <BarChart data={analise.modulos} margin={{ left: -20, right: 10 }}>
+          <BarChart data={analise.modulos} margin={{ top: 8, right: 8, bottom: 6, left: -28 }}>
             <CartesianGrid vertical={false} />
-            <XAxis dataKey="modulo" tickLine={false} axisLine={false} interval={0} />
-            <YAxis allowDecimals={false} tickLine={false} axisLine={false} />
+            <XAxis
+              dataKey="moduloCurto"
+              tickLine={false}
+              axisLine={false}
+              interval={0}
+              tick={{ fontSize: 11 }}
+            />
+            <YAxis
+              allowDecimals={false}
+              tickLine={false}
+              axisLine={false}
+              tick={{ fontSize: 11 }}
+            />
             <ChartTooltip content={<ChartTooltipContent />} />
             <Bar dataKey="total" radius={[8, 8, 0, 0]} fill="var(--color-total)" />
           </BarChart>
         </ChartContainer>
       </section>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-5">
         {[
           { label: "Protocolos ativos", valor: analise.ativos.length },
           { label: "Conclusão", valor: `${analise.taxaConclusao}%` },
@@ -734,9 +756,12 @@ function AnaliseModule({
           { label: "Aluguéis/mês", valor: formatarMoeda(analise.totalAlugueis) },
           { label: "Repasses/mês", valor: formatarMoeda(analise.totalRepasses) },
         ].map((item) => (
-          <div key={item.label} className="shadow-soft rounded-2xl border bg-card p-4">
+          <div
+            key={item.label}
+            className="shadow-soft min-w-0 rounded-2xl border bg-card p-3 sm:p-4"
+          >
             <p className="text-eyebrow text-muted-foreground">{item.label}</p>
-            <p className="mt-1.5 font-display text-lg font-bold break-words sm:text-2xl">
+            <p className="mt-1.5 font-display text-base font-bold break-words sm:text-2xl">
               {item.valor}
             </p>
           </div>
@@ -744,10 +769,10 @@ function AnaliseModule({
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <section className="shadow-soft rounded-2xl border bg-card p-4 sm:p-5">
+        <section className="shadow-soft min-w-0 rounded-2xl border bg-card p-4 sm:p-5">
           <div className="flex items-start justify-between gap-3">
-            <div>
-              <h2 className="font-display text-lg font-bold">Protocolos por status</h2>
+            <div className="min-w-0">
+              <h2 className="font-display text-lg font-bold break-words">Protocolos por status</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 Mostra onde a operação está concentrada hoje.
               </p>
@@ -755,20 +780,31 @@ function AnaliseModule({
           </div>
           <ChartContainer
             config={{ total: { label: "Protocolos", color: "var(--color-brand-bright)" } }}
-            className="mt-4 h-72 w-full"
+            className="mt-4 h-56 w-full sm:h-64 lg:h-72"
           >
-            <BarChart data={analise.porStatus} margin={{ left: -20, right: 10 }}>
+            <BarChart data={analise.porStatus} margin={{ top: 8, right: 8, bottom: 6, left: -28 }}>
               <CartesianGrid vertical={false} />
-              <XAxis dataKey="label" tickLine={false} axisLine={false} interval={0} />
-              <YAxis allowDecimals={false} tickLine={false} axisLine={false} />
+              <XAxis
+                dataKey="labelCurto"
+                tickLine={false}
+                axisLine={false}
+                interval={0}
+                tick={{ fontSize: 11 }}
+              />
+              <YAxis
+                allowDecimals={false}
+                tickLine={false}
+                axisLine={false}
+                tick={{ fontSize: 11 }}
+              />
               <ChartTooltip content={<ChartTooltipContent />} />
               <Bar dataKey="total" radius={[8, 8, 0, 0]} fill="var(--color-total)" />
             </BarChart>
           </ChartContainer>
         </section>
 
-        <section className="shadow-soft rounded-2xl border bg-card p-4 sm:p-5">
-          <h2 className="font-display text-lg font-bold">Leitura rápida</h2>
+        <section className="shadow-soft min-w-0 rounded-2xl border bg-card p-4 sm:p-5">
+          <h2 className="font-display text-lg font-bold break-words">Leitura rápida</h2>
           <div className="mt-4 space-y-3 text-sm">
             <AnaliseInsight label="Maior concentração" value={principalStatus?.label ?? "—"} />
             <AnaliseInsight label="Tipo mais recorrente" value={principalImovel?.label ?? "—"} />
@@ -784,14 +820,14 @@ function AnaliseModule({
         </section>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-2">
         <AnalisePieCard title="Tipos de imóvel" data={analise.porImovel} />
         <AnalisePieCard title="Tipos de negociação" data={analise.porNegociacao} />
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[360px_minmax(0,1fr)]">
-        <section className="shadow-soft rounded-2xl border bg-card p-4 sm:p-5">
-          <h2 className="font-display text-lg font-bold">Fila de atenção</h2>
+      <div className="grid min-w-0 gap-4 xl:grid-cols-[360px_minmax(0,1fr)]">
+        <section className="shadow-soft min-w-0 rounded-2xl border bg-card p-4 sm:p-5">
+          <h2 className="font-display text-lg font-bold break-words">Fila de atenção</h2>
           <div className="mt-4 space-y-3">
             {analise.pendencias.map((item) => (
               <div
@@ -805,8 +841,8 @@ function AnaliseModule({
           </div>
         </section>
 
-        <section className="shadow-soft rounded-2xl border bg-card p-4 sm:p-5">
-          <h2 className="font-display text-lg font-bold">Últimas atualizações</h2>
+        <section className="shadow-soft min-w-0 rounded-2xl border bg-card p-4 sm:p-5">
+          <h2 className="font-display text-lg font-bold break-words">Últimas atualizações</h2>
           <div className="mt-4 space-y-3">
             {analise.atualizados.length === 0 ? (
               <p className="rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
@@ -842,9 +878,9 @@ function AnaliseModule({
 
 function AnaliseInsight({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border bg-background p-3">
+    <div className="min-w-0 rounded-xl border bg-background p-3">
       <p className="text-eyebrow text-muted-foreground">{label}</p>
-      <p className="mt-1 font-semibold">{value}</p>
+      <p className="mt-1 text-sm font-semibold break-words sm:text-base">{value}</p>
     </div>
   );
 }
@@ -853,7 +889,7 @@ function AnaliseMetric({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0">
       <dt className="text-eyebrow text-muted-foreground">{label}</dt>
-      <dd className="mt-1 font-semibold break-words">{value}</dd>
+      <dd className="mt-1 text-sm font-semibold break-words sm:text-base">{value}</dd>
     </div>
   );
 }
@@ -886,8 +922,6 @@ function gerarRelatorioPdf(
   imoveisAdministrados: ImovelAdministrado[],
 ) {
   // pop-ups são bloqueados no preview/iframe: imprimimos via iframe oculto
-
-
   const hoje = new Date().toLocaleDateString("pt-BR");
   const moduleRows = analise.modulos
     .map(
@@ -1116,7 +1150,6 @@ function gerarRelatorioPdf(
   else iframe.addEventListener("load", () => window.setTimeout(imprimir, 300));
 }
 
-
 function escapeHtml(value: string) {
   return value
     .replaceAll("&", "&amp;")
@@ -1139,27 +1172,30 @@ function AnalisePieCard({
   }));
 
   return (
-    <section className="shadow-soft rounded-2xl border bg-card p-4 sm:p-5">
-      <h2 className="font-display text-lg font-bold">{title}</h2>
+    <section className="shadow-soft min-w-0 rounded-2xl border bg-card p-4 sm:p-5">
+      <h2 className="font-display text-lg font-bold break-words">{title}</h2>
       <ChartContainer
         config={{ total: { label: "Protocolos" } }}
-        className="mx-auto mt-4 h-64 w-full max-w-md"
+        className="mx-auto mt-3 h-52 w-full max-w-sm sm:mt-4 sm:h-60 md:h-64 md:max-w-md"
       >
         <PieChart>
           <ChartTooltip content={<ChartTooltipContent nameKey="label" />} />
-          <Pie data={chartData} dataKey="total" nameKey="label" innerRadius={52} outerRadius={82}>
+          <Pie data={chartData} dataKey="total" nameKey="label" innerRadius="52%" outerRadius="78%">
             {chartData.map((entry) => (
               <Cell key={entry.label} fill={entry.fill} />
             ))}
           </Pie>
         </PieChart>
       </ChartContainer>
-      <div className="mt-4 grid gap-2">
+      <div className="mt-3 grid gap-2 sm:mt-4">
         {chartData.map((item) => (
-          <div key={item.label} className="flex items-center justify-between gap-3 text-sm">
+          <div
+            key={item.label}
+            className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 text-sm"
+          >
             <span className="flex min-w-0 items-center gap-2">
               <span className="size-2.5 shrink-0 rounded-full" style={{ background: item.fill }} />
-              <span className="truncate">{item.label}</span>
+              <span className="min-w-0 truncate">{item.label}</span>
             </span>
             <span className="font-semibold">{item.total}</span>
           </div>
