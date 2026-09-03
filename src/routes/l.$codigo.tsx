@@ -374,7 +374,7 @@ function ConsultaLocacao() {
                     size="sm"
                     variant="secondary"
                     className="h-8 rounded-full bg-white/15 px-3 text-primary-foreground hover:bg-white/25"
-                    onClick={() => baixarPdfComSenha(data)}
+                    onClick={() => setSenhaAberta(true)}
                   >
                     <FileDown className="size-4" />
                     Baixar PDF
