@@ -271,12 +271,10 @@ function AnexoBotao({
   valor,
   onChange,
   label,
-  publicoDownload = false,
 }: {
   valor: string;
   onChange: (path: string) => void;
   label: string;
-  publicoDownload?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [enviando, setEnviando] = useState(false);
@@ -1030,7 +1028,6 @@ export function LocacaoDialog({
                 />
                 <AnexoBotao
                   label="Documento da negociação"
-                  publicoDownload
                   valor={form.doc_negociacao_url}
                   onChange={(path) => set("doc_negociacao_url", path)}
                 />
