@@ -1,10 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { jsPDF } from "jspdf";
-import { ArrowLeft, Building2, Download, FileDown } from "lucide-react";
+import { ArrowLeft, Building2, Download, FileDown, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { Wordmark } from "@/components/brand";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { formatarData, formatarDataHora, enderecoCompleto } from "@/lib/protocolos";
