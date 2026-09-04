@@ -204,15 +204,15 @@ export function LocacaoModule() {
   return (
     <ModuleShell
       title="Locação de Imóveis"
-      description="Controle contratos, ocupação, vencimentos e vistoria de imóveis alugados."
+      description="Controle contratos, ocupação, vencimentos e status de imóveis alugados."
       stats={[
         { label: "Contratos", valor: lista.length },
         {
-          label: "Vistoria em análise",
+          label: "Locação em análise",
           valor: lista.filter((l) => l.status_vistoria === "em_analise").length,
         },
         {
-          label: "Vistoria em andamento",
+          label: "Locação em andamento",
           valor: lista.filter((l) => l.status_vistoria === "em_andamento").length,
         },
         { label: "Aluguéis/mês", valor: formatarMoeda(totalAluguel) },

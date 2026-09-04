@@ -1,8 +1,15 @@
-export type StatusVistoria = "em_analise" | "em_andamento" | "concluido";
+export type StatusVistoria =
+  | "em_analise"
+  | "em_andamento"
+  | "contrato"
+  | "contrato_assinado"
+  | "concluido";
 
 export const STATUS_VISTORIA_LABEL: Record<string, string> = {
   em_analise: "Em análise",
   em_andamento: "Em andamento",
+  contrato: "Contrato",
+  contrato_assinado: "Contrato Assinado",
   concluido: "Concluído",
 };
 

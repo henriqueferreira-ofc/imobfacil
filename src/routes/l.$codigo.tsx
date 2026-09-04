@@ -285,6 +285,253 @@ function baixarPdfLocacao(data: LocacaoPublica) {
   doc.save(`${data.codigo || "locacao"}-contrato.pdf`);
 }
 
+function textoLocatarioChecklist(data: LocacaoPublica) {
+  if (data.locatario_tipo_pessoa === "juridica") {
+    return {
+      nome: data.empresa_nome || data.resp_nome || data.locatario,
+      documento: data.empresa_cnpj || data.resp_cpf || data.locatario_cpf,
+    };
+  }
+
+  return {
+    nome: data.locatario,
+    documento: data.locatario_cpf,
+  };
+}
+
+async function carregarImagemDataUrl(src: string) {
+  const response = await fetch(src);
+  if (!response.ok) {
+    throw new Error("Logo não encontrada");
+  }
+
+  const blob = await response.blob();
+  return await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(new Error("Não foi possível carregar a logo"));
+    reader.readAsDataURL(blob);
+  });
+}
+
+function adicionarCabecalhoChecklist(doc: jsPDF, logoDataUrl: string) {
+  doc.setFillColor(6, 42, 111);
+  doc.roundedRect(0, 6, 110, 18, 2, 2, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(13);
+  doc.text("TERMO DE VISTORIA", 30, 13.5);
+  doc.setFontSize(8);
+  doc.text("LOCAÇÃO DE IMÓVEL COM ADMINISTRAÇÃO", 30, 20);
+
+  doc.addImage(logoDataUrl, "PNG", 150, 8, 44, 18);
+}
+
+function adicionarRodapeChecklist(doc: jsPDF, pagina: number) {
+  doc.setTextColor(0, 0, 0);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(5.5);
+  doc.text("Termo De Vistoria", 105, 283, { align: "center" });
+  doc.text("BRIGIDO IMÓVEIS CRECI-PA 1158J", 105, 286, { align: "center" });
+  doc.setFont("helvetica", "normal");
+  doc.text(
+    "Rua J2, QD 275, LT 01B, Cidade Jardim - Parauapebas - PA | CEP 68.515-000 - Brasil",
+    105,
+    289,
+    {
+      align: "center",
+    },
+  );
+  doc.text(
+    "Contatos: 94- 98111-0462 (WhatsApp); 94 98437-8638; e-mail: brigidoimoveis@outlook.com",
+    105,
+    292,
+    {
+      align: "center",
+    },
+  );
+  doc.setFont("helvetica", "bold");
+  doc.text(`Página ${pagina} de 2`, 176, 286, { align: "center" });
+}
+
+function adicionarTituloSecaoChecklist(doc: jsPDF, titulo: string, y: number) {
+  doc.setFillColor(210, 208, 208);
+  doc.rect(30, y, 160, 5, "F");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.text(titulo, 31, y + 3.8);
+  return y + 8;
+}
+
+function adicionarTextoChecklist(doc: jsPDF, texto: string, y: number, bold = false) {
+  doc.setFont("helvetica", bold ? "bold" : "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(0, 0, 0);
+  doc.text(texto, 31, y);
+  return y + 4.8;
+}
+
+function adicionarObsChecklist(doc: jsPDF, y: number, linhas = 1) {
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.text("Obs:", 31, y);
+  doc.line(38, y + 0.7, 190, y + 0.7);
+  y += 5.5;
+  for (let i = 1; i < linhas; i += 1) {
+    doc.line(31, y + 0.7, 190, y + 0.7);
+    y += 5.5;
+  }
+  return y + 2;
+}
+
+function adicionarLinhaChecklist(doc: jsPDF, y: number) {
+  doc.line(31, y, 190, y);
+  return y + 6;
+}
+
+async function baixarChecklistLocacao(data: LocacaoPublica) {
+  let logoDataUrl = "";
+  try {
+    logoDataUrl = await carregarImagemDataUrl("/brigido-logo.png");
+  } catch {
+    toast.error("Logo não encontrada", {
+      description: "Adicione o PNG original em public/brigido-logo.png.",
+    });
+    return;
+  }
+
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const locatario = textoLocatarioChecklist(data);
+  const endereco = enderecoCompleto(data);
+  const tipoImovel = data.tipo_locacao === "comercial" ? "Comercial" : "Residencial";
+
+  adicionarCabecalhoChecklist(doc, logoDataUrl);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.text("LAUDO DE VISTORIA DE IMÓVEL – LOCAÇÃO (VISTORIA INICIAL)", 105, 38, {
+    align: "center",
+  });
+
+  let y = 48;
+  y = adicionarTituloSecaoChecklist(doc, "1. IDENTIFICAÇÃO DO LAUDO", y);
+  y = adicionarTextoChecklist(
+    doc,
+    `Data da vistoria: ${formatarData(new Date().toISOString())}`,
+    y,
+  );
+  y = adicionarTextoChecklist(doc, `Tipo de imóvel: ${tipoImovel}`, y);
+  y = adicionarTextoChecklist(doc, `Endereço completo: ${valorPdf(endereco)}`, y);
+  y = adicionarTextoChecklist(doc, "Finalidade: vistoria inicial para locação", y);
+
+  y += 3;
+  y = adicionarTituloSecaoChecklist(doc, "2. IDENTIFICAÇÃO DAS PARTES", y);
+  y = adicionarTextoChecklist(doc, "LOCADOR:", y);
+  y = adicionarTextoChecklist(doc, "Nome: BRIGIDO IMÓVEIS", y);
+  y = adicionarTextoChecklist(doc, "CPF/CNPJ: 47.263.424/0001-02", y);
+  y = adicionarTextoChecklist(doc, "LOCATÁRIO:", y);
+  y = adicionarTextoChecklist(doc, `Nome/Razão Social: ${valorPdf(locatario.nome)}`, y);
+  y = adicionarTextoChecklist(doc, `CPF/CNPJ: ${valorPdf(locatario.documento)}`, y);
+  y = adicionarTextoChecklist(doc, `Corretor Responsável: ${valorPdf(data.corretor)}`, y);
+
+  y += 3;
+  y = adicionarTituloSecaoChecklist(doc, "3. METODOLOGIA DA VISTORIA", y);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.text(
+    doc.splitTextToSize(
+      "Vistoria visual, técnica e descritiva, limitada ao estado aparente do imóvel, com registro fotográfico integrante do laudo.",
+      160,
+    ),
+    31,
+    y,
+  );
+  y += 11;
+
+  y = adicionarTituloSecaoChecklist(doc, "4. ESTADO GERAL DO IMÓVEL", y);
+  y = adicionarTextoChecklist(doc, "4.1 PINTURA", y, true);
+  y = adicionarTextoChecklist(
+    doc,
+    "( ) Nova    ( ) Usada em bom estado    ( ) Necessita reparos",
+    y,
+  );
+  y = adicionarObsChecklist(doc, y, 2);
+  y = adicionarTextoChecklist(doc, "4.2 PARTE ELÉTRICA", y, true);
+  y = adicionarTextoChecklist(doc, "( ) Tomadas e interruptores funcionando", y);
+  y = adicionarTextoChecklist(doc, "( ) Quadro de energia testado e sem falhas", y);
+  y = adicionarTextoChecklist(doc, "( ) Lâmpadas e bocais em ordem", y);
+  y = adicionarObsChecklist(doc, y, 2);
+  y = adicionarTextoChecklist(doc, "4.3 PARTE HIDRÁULICA", y, true);
+  y = adicionarTextoChecklist(doc, "( ) Torneiras e registros sem vazamentos", y);
+  y = adicionarTextoChecklist(doc, "( ) Vasos sanitários e descargas funcionando", y);
+  y = adicionarTextoChecklist(doc, "( ) Escoamento de pias e ralos livre", y);
+  y = adicionarObsChecklist(doc, y, 2);
+  y = adicionarTextoChecklist(doc, "4.4 PORTÃO ELETRÔNICO E CERCA ELÉTRICA", y, true);
+  y = adicionarTextoChecklist(doc, "( ) Portão funcionando (Qtd. controles: ___)", y);
+  y += 4;
+  y = adicionarTextoChecklist(doc, "( ) Cerca elétrica ativada e com hastes íntegras", y);
+  adicionarObsChecklist(doc, y, 2);
+  adicionarRodapeChecklist(doc, 1);
+
+  doc.addPage();
+  adicionarCabecalhoChecklist(doc, logoDataUrl);
+  y = 45;
+  y = adicionarTextoChecklist(doc, "4.5 PORTAS E JANELAS", y, true);
+  y = adicionarTextoChecklist(doc, "( ) Vidros íntegros, sem trincas", y);
+  y = adicionarTextoChecklist(doc, "( ) Fechaduras e trincos funcionando (Qtd. chaves: ___)", y);
+  y = adicionarObsChecklist(doc, y, 2);
+  y = adicionarTextoChecklist(doc, "4.6 TELHADO", y, true);
+  y = adicionarTextoChecklist(doc, "( ) Sem telhas quebradas ou infiltrações visíveis", y);
+  y = adicionarTextoChecklist(doc, "( ) Calhas limpas", y);
+  y = adicionarObsChecklist(doc, y, 2);
+  y = adicionarTextoChecklist(doc, "4.7 AR CONDICIONADO", y, true);
+  y = adicionarTextoChecklist(
+    doc,
+    "( ) Aparelho higienizado e funcionando (Qtd. controles: ___)",
+    y,
+  );
+  y = adicionarTextoChecklist(doc, "( ) Dreno sem vazamentos para o interior", y);
+  y = adicionarObsChecklist(doc, y, 2);
+  y = adicionarTextoChecklist(doc, "4.8 LIMPEZA", y, true);
+  y = adicionarTextoChecklist(doc, "( ) Realizada limpeza completa    ( ) Faltou limpar", y);
+  y = adicionarObsChecklist(doc, y, 2);
+  y = adicionarTextoChecklist(doc, "4.9 CHAVES, CONTROLES E SENHAS", y, true);
+  y = adicionarTextoChecklist(doc, "( ) Entregue    ( ) Falta entregar", y);
+  y = adicionarObsChecklist(doc, y, 2);
+
+  y += 4;
+  y = adicionarTituloSecaoChecklist(doc, "5. OBSERVAÇÕES FINAIS", y);
+  y = adicionarLinhaChecklist(doc, y);
+  y = adicionarLinhaChecklist(doc, y);
+
+  y += 12;
+  y = adicionarTituloSecaoChecklist(doc, "6. DECLARAÇÃO DO LOCATÁRIO", y);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.text(
+    doc.splitTextToSize(
+      "Declaro que vistorei o imóvel e concordo com as condições descritas neste laudo, que servirá como base para a vistoria de devolução.",
+      160,
+    ),
+    31,
+    y,
+  );
+
+  y += 18;
+  y = adicionarTituloSecaoChecklist(doc, "7. ASSINATURAS", y);
+  y += 22;
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.line(38, y, 92, y);
+  doc.text("Locatário(a)", 65, y + 5, { align: "center" });
+  doc.line(114, y, 168, y);
+  doc.text("Corretor(a) Responsável:", 141, y + 5, { align: "center" });
+  adicionarRodapeChecklist(doc, 2);
+
+  doc.save(`${data.codigo || "locacao"}-checklist.pdf`);
+}
+
 export const Route = createFileRoute("/l/$codigo")({
   head: ({ params }) => ({
     meta: [
@@ -365,19 +612,29 @@ function ConsultaLocacao() {
                 <h1 className="font-display text-2xl font-bold break-all sm:truncate sm:break-normal sm:text-3xl lg:text-4xl">
                   {data.codigo}
                 </h1>
-                <div className="flex flex-col items-start gap-2 sm:items-end">
-                  <span className="rounded-full bg-card px-3 py-1.5 text-sm font-semibold text-foreground">
+                <div className="flex w-full max-w-[180px] flex-col items-stretch gap-2 sm:w-[176px]">
+                  <span className="inline-flex h-9 items-center justify-center rounded-full bg-card px-4 text-center text-sm font-semibold whitespace-nowrap text-foreground shadow-sm">
                     {STATUS_VISTORIA_LABEL[data.status_vistoria] ?? data.status_vistoria}
                   </span>
                   <Button
                     type="button"
                     size="sm"
                     variant="secondary"
-                    className="h-8 rounded-full bg-white/15 px-3 text-primary-foreground hover:bg-white/25"
+                    className="h-9 w-full justify-center rounded-full border border-white/15 bg-white/14 px-4 text-xs font-semibold whitespace-nowrap text-primary-foreground shadow-sm backdrop-blur-sm hover:bg-white/24"
                     onClick={() => setSenhaAberta(true)}
                   >
-                    <FileDown className="size-4" />
+                    <FileDown className="size-4 shrink-0" />
                     Baixar PDF
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    className="h-9 w-full justify-center rounded-full border border-white/15 bg-white/14 px-4 text-xs font-semibold whitespace-nowrap text-primary-foreground shadow-sm backdrop-blur-sm hover:bg-white/24"
+                    onClick={() => void baixarChecklistLocacao(data)}
+                  >
+                    <FileDown className="size-4 shrink-0" />
+                    Baixar Checklist
                   </Button>
                 </div>
               </div>

@@ -1039,7 +1039,7 @@ export function LocacaoDialog({
 
             <CampoSelect
               campo="status_vistoria"
-              label="Status da vistoria"
+              label="Status da locação"
               opcoes={Object.entries(STATUS_VISTORIA_LABEL).map(([value, label]) => ({
                 value,
                 label,
