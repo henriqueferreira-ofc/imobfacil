@@ -427,7 +427,7 @@ async function baixarChecklistLocacao(data: LocacaoPublica) {
 
   y += 3;
   y = adicionarTituloSecaoChecklist(doc, "2. IDENTIFICAÇÃO DAS PARTES", y);
-  y = adicionarTextoChecklist(doc, "LOCADOR:", y);
+  y = adicionarTextoChecklist(doc, "INTERMEDIAÇÃO IMOBILIÁRIA:", y);
   y = adicionarTextoChecklist(doc, "Nome: BRIGIDO IMÓVEIS", y);
   y = adicionarTextoChecklist(doc, "CPF/CNPJ: 47.263.424/0001-02", y);
   y = adicionarTextoChecklist(doc, "LOCATÁRIO:", y);
